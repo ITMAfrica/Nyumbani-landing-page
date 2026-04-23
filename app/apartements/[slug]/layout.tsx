@@ -16,7 +16,7 @@ export async function generateMetadata({
   const apt = getApartmentBySlug(slug);
   if (!apt) return { title: 'Apartment' };
   return {
-    title: `${apt.title} | Nyumbani Platinum`,
+    title: apt.title,
     description: `Photo gallery — ${apt.title}`,
   };
 }

@@ -2,16 +2,13 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Image, { type StaticImageData } from 'next/image';
-import Link from 'next/link';
-import { ArrowLeft, ChevronRight, Menu, X } from 'lucide-react';
+import { ArrowLeft, ChevronRight, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
-import { APARTMENTS } from '@/lib/apartments';
-
-import heroPlatinum from '../photos/GARDEN_CITY_RESIDENCE_302_SERVICED_APARTMENTS/IMG_4191.jpg';
-import heroGold from '../photos/5B4_MI_VIDA_SERVICED_APARTMENT/IMG_4379.jpg';
-import sectionVillaTop from '../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_5001.jpg';
-import sectionVillaBottom from '../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4450.jpg';
+import heroPlatinum from '../photos/GARDEN_CITY_RESIDENCE_302_SERVICED_APARTMENTS/IMG_4191.webp';
+import heroGold from '../photos/5B4_MI_VIDA_SERVICED_APARTMENT/IMG_4379.webp';
+import sectionVillaTop from '../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_5001.webp';
+import sectionVillaBottom from '../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4450.webp';
 
 const HERO_CONTENT: {
   tagline: string;
@@ -49,7 +46,6 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [enquirePhase, setEnquirePhase] = useState<'pick' | 'form'>('pick');
   const [enquireTier, setEnquireTier] = useState<EnquireTier | null>(null);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const openEnquireModal = useCallback(() => {
     setEnquirePhase('pick');
@@ -89,7 +85,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (isModalOpen || isMenuOpen) {
+    if (isModalOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -97,7 +93,7 @@ export default function Home() {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [isModalOpen, isMenuOpen]);
+  }, [isModalOpen]);
 
   useEffect(() => {
     const onOpen = () => openEnquireModal();
@@ -143,8 +139,7 @@ export default function Home() {
         </div>
 
         {/* Header */}
-        <header className="relative z-10 flex justify-between items-center px-8 py-6 w-full max-w-[1600px] mx-auto">
-          {/* Logo */}
+        <header className="relative z-10 flex items-center px-8 py-6 w-full max-w-[1600px] mx-auto">
           <div className="flex items-center gap-3 text-white">
             <Image 
               src="https://auzyjcdanenhoqyrbjxg.supabase.co/storage/v1/object/public/images/users/7a23a808-8309-4bff-b922-1a9db7482400/e38b6f4a-4227-48e6-8f6d-b3acea7daa8c.png" 
@@ -156,16 +151,6 @@ export default function Home() {
               referrerPolicy="no-referrer"
             />
           </div>
-
-          <button
-            type="button"
-            onClick={() => setIsMenuOpen((open) => !open)}
-            className="text-white transition hover:opacity-75"
-            aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={isMenuOpen}
-          >
-            {isMenuOpen ? <X size={32} strokeWidth={1.5} /> : <Menu size={32} strokeWidth={1.5} />}
-          </button>
         </header>
 
         {/* Hero Content */}
@@ -364,11 +349,12 @@ export default function Home() {
                           className="group relative flex min-h-[280px] overflow-hidden rounded-2xl border border-white/20 text-left shadow-[0_24px_60px_-20px_rgba(0,0,0,0.5)] transition hover:border-white/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d4af37]/80 sm:min-h-0"
                         >
                           <Image
-                            src="/enquire-collections.png"
+                            src={heroGold}
                             alt="Nyumbani Gold — living collection"
                             fill
-                            className="object-cover object-[22%_center] transition duration-700 group-hover:scale-[1.03]"
+                            className="object-cover object-center transition duration-700 group-hover:scale-[1.03]"
                             sizes="(max-width: 640px) 100vw, 50vw"
+                            placeholder="blur"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/10" />
                           <div className="relative mt-auto flex w-full flex-col gap-3 p-6 sm:p-8">
@@ -396,11 +382,12 @@ export default function Home() {
                           className="group relative flex min-h-[280px] overflow-hidden rounded-2xl border border-white/20 text-left shadow-[0_24px_60px_-20px_rgba(0,0,0,0.5)] transition hover:border-white/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d4af37]/80 sm:min-h-0"
                         >
                           <Image
-                            src="/enquire-collections.png"
+                            src={heroPlatinum}
                             alt="Nyumbani Premium — investment collection"
                             fill
-                            className="object-cover object-[78%_center] transition duration-700 group-hover:scale-[1.03]"
+                            className="object-cover object-center transition duration-700 group-hover:scale-[1.03]"
                             sizes="(max-width: 640px) 100vw, 50vw"
+                            placeholder="blur"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/10" />
                           <div className="relative mt-auto flex w-full flex-col gap-3 p-6 sm:p-8">
@@ -576,86 +563,6 @@ export default function Home() {
                 </AnimatePresence>
               </div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Apartments menu (from hamburger) */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-[45] flex justify-end"
-          >
-            <button
-              type="button"
-              className="absolute inset-0 bg-black/55 backdrop-blur-sm"
-              aria-label="Close menu"
-              onClick={() => setIsMenuOpen(false)}
-            />
-            <motion.aside
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 28, stiffness: 320 }}
-              className="relative z-10 flex h-full w-full max-w-md flex-col overflow-y-auto border-l border-white/10 bg-[#1a2633] shadow-2xl"
-            >
-              <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#d4af37]">
-                    Apartments
-                  </p>
-                  <p className="mt-1 font-serif text-lg text-white">Our residences</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="rounded-md p-2 text-white/70 transition hover:bg-white/10 hover:text-white"
-                  aria-label="Close"
-                >
-                  <X size={22} strokeWidth={1.5} />
-                </button>
-              </div>
-
-              <nav className="flex flex-1 flex-col gap-2 p-4" aria-label="Apartments">
-                {APARTMENTS.map((apt) => {
-                  const coverSrc = `/api/photo/${apt.slug}/${encodeURIComponent(apt.coverFile)}`;
-                  return (
-                    <Link
-                      key={apt.slug}
-                      href={`/apartements/${apt.slug}`}
-                      onClick={() => setIsMenuOpen(false)}
-                      className="group flex gap-4 rounded-lg border border-transparent p-3 transition hover:border-white/15 hover:bg-white/5"
-                    >
-                      <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-md bg-slate-800">
-                        <Image
-                          src={coverSrc}
-                          alt=""
-                          fill
-                          className="object-cover transition duration-300 group-hover:scale-105"
-                          sizes="112px"
-                          unoptimized
-                        />
-                      </div>
-                      <div className="flex min-w-0 flex-1 flex-col justify-center">
-                        <span className="font-serif text-base text-white transition group-hover:text-[#d4af37]">
-                          {apt.title}
-                        </span>
-                        {apt.subtitle ? (
-                          <span className="mt-0.5 text-xs text-white/55">{apt.subtitle}</span>
-                        ) : null}
-                        <span className="mt-2 text-[10px] font-semibold uppercase tracking-wider text-[#d4af37]/90">
-                          View gallery →
-                        </span>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </nav>
-            </motion.aside>
           </motion.div>
         )}
       </AnimatePresence>

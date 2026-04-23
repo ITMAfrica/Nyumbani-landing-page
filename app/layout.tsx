@@ -14,7 +14,10 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: 'Nyumbani Platinum | Real Estate',
+  title: {
+    default: 'Nyumbani Landing Page',
+    template: '%s | Nyumbani Landing Page',
+  },
   description: 'Exclusive tier of the Nyumbani brand, designed for investors who want access to Nairobi\'s most promising real estate opportunities.',
 };
 

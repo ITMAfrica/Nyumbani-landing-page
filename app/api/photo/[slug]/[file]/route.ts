@@ -6,7 +6,16 @@ import { getApartmentFolderBySlug } from '@/lib/apartments';
 
 function isSafeFilename(name: string): boolean {
   if (!name || name.includes('..') || /[/\\]/.test(name)) return false;
-  return /\.(jpe?g)$/i.test(name);
+  return /\.(jpe?g|png|gif|webp)$/i.test(name);
+}
+
+function contentTypeFor(name: string): string {
+  const l = name.toLowerCase();
+  if (l.endsWith('.webp')) return 'image/webp';
+  if (l.endsWith('.png')) return 'image/png';
+  if (l.endsWith('.gif')) return 'image/gif';
+  if (l.endsWith('.jpg') || l.endsWith('.jpeg')) return 'image/jpeg';
+  return 'application/octet-stream';
 }
 
 export async function GET(
@@ -31,7 +40,7 @@ export async function GET(
     const buf = await readFile(fullPath);
     return new NextResponse(buf, {
       headers: {
-        'Content-Type': 'image/jpeg',
+        'Content-Type': contentTypeFor(file),
         'Cache-Control': 'public, max-age=31536000, immutable',
       },
     });

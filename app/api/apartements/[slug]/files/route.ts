@@ -17,8 +17,18 @@ export async function GET(
   const dir = join(process.cwd(), 'photos', apt.folder);
   try {
     const names = await readdir(dir);
+    const lower = new Set(names.map((n) => n.toLowerCase()));
     const files = names
-      .filter((n) => /\.(jpe?g)$/i.test(n))
+      .filter((n) => {
+        if (/\.webp$/i.test(n)) {
+          return true;
+        }
+        if (!/\.(jpe?g|png|gif|bmp|tiff?)$/i.test(n)) {
+          return false;
+        }
+        const webpName = n.replace(/\.(jpe?g|png|gif|bmp|tiff?)$/i, '.webp');
+        return !lower.has(webpName.toLowerCase());
+      })
       .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
     return NextResponse.json({ files });
   } catch {
