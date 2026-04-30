@@ -4,7 +4,26 @@ import { useI18n } from '@/lib/i18n';
 import { PricingPageLayout, PricingTierCard } from '@/components/pricing-page-layout';
 
 import heroGold from '../../../photos/hero-2.jpg';
-import heroPlatinum from '../../../photos/hero-1.jpg';
+
+/** Mi Vida 5B4 gallery — used for the 1 bedroom pricing card. */
+const GOLD_1BED_GALLERY = [
+  '/api/photo/5b4-mi-vida/IMG_4343.webp',
+  '/api/photo/5b4-mi-vida/IMG_4350.webp',
+  '/api/photo/5b4-mi-vida/IMG_4379.webp',
+  '/api/photo/5b4-mi-vida/IMG_4381.webp',
+  '/api/photo/5b4-mi-vida/IMG_4428.webp',
+  '/api/photo/5b4-mi-vida/IMG_4434.webp',
+] as const;
+
+/** Imagine by Benaa gallery — used for the 2 bedroom pricing card. */
+const GOLD_2BED_GALLERY = [
+  '/api/photo/imagine-by-benaa/IMG_4434.webp',
+  '/api/photo/imagine-by-benaa/IMG_4442.webp',
+  '/api/photo/imagine-by-benaa/IMG_4450.webp',
+  '/api/photo/imagine-by-benaa/IMG_4455.webp',
+  '/api/photo/imagine-by-benaa/IMG_4464.webp',
+  '/api/photo/imagine-by-benaa/IMG_4469.webp',
+] as const;
 
 export function GoldPricingView() {
   const { dict } = useI18n();
@@ -57,7 +76,7 @@ export function GoldPricingView() {
         </PricingTierCard>
 
         <PricingTierCard
-          image={heroPlatinum}
+          images={[...GOLD_1BED_GALLERY]}
           imageAlt={`${dict.pricing.tier1Bed} — Nyumbani Gold`}
           title={dict.pricing.tier1Bed}
         >
@@ -100,7 +119,7 @@ export function GoldPricingView() {
         </PricingTierCard>
 
         <PricingTierCard
-          image="/hero-new.jpg"
+          images={[...GOLD_2BED_GALLERY]}
           imageAlt={`${dict.pricing.tier2Bed} — Nyumbani Gold`}
           title={dict.pricing.tier2Bed}
         >

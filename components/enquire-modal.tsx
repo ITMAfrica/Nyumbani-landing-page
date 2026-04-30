@@ -18,9 +18,11 @@ export type EnquireModalProps = {
   open: boolean;
   view: EnquireModalView;
   leadThankYou: boolean;
+  leadSubmitting: boolean;
+  leadError: string | null;
   modal: Dictionary['modal'];
   onClose: () => void;
-  onLeadSubmit: (e: FormEvent<HTMLFormElement>) => void;
+  onLeadSubmit: (e: FormEvent<HTMLFormElement>) => void | Promise<void>;
   onSelectGold: () => void;
   onSelectPlatinum: () => void;
 };
@@ -29,6 +31,8 @@ export function EnquireModal({
   open,
   view,
   leadThankYou,
+  leadSubmitting,
+  leadError,
   modal,
   onClose,
   onLeadSubmit,
@@ -129,6 +133,7 @@ export function EnquireModal({
                           type="text"
                           autoComplete="name"
                           required
+                          disabled={leadSubmitting}
                           placeholder={modal.fullName}
                           className={glassField}
                         />
@@ -143,17 +148,24 @@ export function EnquireModal({
                           type="email"
                           autoComplete="email"
                           required
+                          disabled={leadSubmitting}
                           placeholder={modal.email}
                           className={glassField}
                         />
                       </div>
                       <button
                         type="submit"
+                        disabled={leadSubmitting}
                         className="inline-flex w-fit items-center gap-2 border border-gold/50 bg-gold/15 px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-white backdrop-blur-sm transition hover:bg-gold/25 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/80"
                       >
-                        {modal.submitContact}
+                        {leadSubmitting ? modal.submitting : modal.submitContact}
                         <ChevronRight className="h-3.5 w-3.5" strokeWidth={2} aria-hidden />
                       </button>
+                      {leadError ? (
+                        <p className="text-xs text-red-200" role="alert">
+                          {leadError}
+                        </p>
+                      ) : null}
                     </form>
                   )
                 ) : (

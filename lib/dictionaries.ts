@@ -34,6 +34,8 @@ export type Dictionary = {
     captureTitle: string;
     captureSubtitle: string;
     submitContact: string;
+    submitting: string;
+    sendFailed: string;
     thankYouContact: string;
     backToCollections: string;
     requestInfo: string;
@@ -66,6 +68,8 @@ export type Dictionary = {
     stayUpdatedDesc: string;
     enterEmail: string;
     subscribe: string;
+    subscribing: string;
+    subscribeFailed: string;
     thankYou: string;
     followUs: string;
     privacyPolicy: string;
@@ -77,6 +81,10 @@ export type Dictionary = {
     home: string;
     photos: string;
     view: string;
+    expandPhotoAria: string;
+    lightboxClose: string;
+    lightboxPrev: string;
+    lightboxNext: string;
   };
   pricing: {
     Kes: string;
@@ -133,6 +141,8 @@ const en: Dictionary = {
     captureSubtitle:
       'Share your name and email—we will get in touch with tailored Gold and Platinum options.',
     submitContact: 'Send',
+    submitting: 'Sending...',
+    sendFailed: 'We could not send your request right now. Please try again.',
     thankYouContact: 'Thank you. Our team will contact you shortly.',
     backToCollections: 'Back to collections',
     requestInfo: 'Request Information',
@@ -166,6 +176,8 @@ const en: Dictionary = {
       'Get the latest investment opportunities delivered to your inbox.',
     enterEmail: 'Enter your email*',
     subscribe: 'Subscribe',
+    subscribing: 'Sending...',
+    subscribeFailed: 'We could not submit your email right now. Please try again.',
     thankYou: 'Thank you. We have received your email.',
     followUs: 'Follow Us',
     privacyPolicy: 'Privacy Policy',
@@ -177,6 +189,10 @@ const en: Dictionary = {
     home: 'Home',
     photos: 'photo(s) — click any image for full size',
     view: 'View',
+    expandPhotoAria: 'Open full-screen photo',
+    lightboxClose: 'Close gallery',
+    lightboxPrev: 'Previous photo',
+    lightboxNext: 'Next photo',
   },
   pricing: {
     Kes: 'KES',
@@ -234,6 +250,8 @@ const fr: Dictionary = {
     captureSubtitle:
       'Indiquez votre nom et votre adresse e-mail — nous vous recontacterons avec des offres Gold et Platinum adaptées.',
     submitContact: 'Envoyer',
+    submitting: 'Envoi...',
+    sendFailed: "Nous n'avons pas pu envoyer votre demande pour le moment. Veuillez reessayer.",
     thankYouContact: 'Merci. Notre équipe vous contactera sous peu.',
     backToCollections: 'Retour aux collections',
     requestInfo: "Demander des informations",
@@ -268,6 +286,8 @@ const fr: Dictionary = {
       'Recevez les dernières opportunités d’investissement directement dans votre boîte mail.',
     enterEmail: 'Entrez votre e-mail*',
     subscribe: "S'abonner",
+    subscribing: 'Envoi...',
+    subscribeFailed: "Nous n'avons pas pu soumettre votre e-mail pour le moment. Veuillez reessayer.",
     thankYou: 'Merci. Nous avons bien reçu votre e-mail.',
     followUs: 'Suivez-nous',
     privacyPolicy: 'Politique de confidentialité',
@@ -279,6 +299,10 @@ const fr: Dictionary = {
     home: 'Accueil',
     photos: 'photo(s) — cliquez sur une image pour la taille réelle',
     view: 'Voir',
+    expandPhotoAria: 'Ouvrir la photo en plein écran',
+    lightboxClose: 'Fermer la galerie',
+    lightboxPrev: 'Photo précédente',
+    lightboxNext: 'Photo suivante',
   },
   pricing: {
     Kes: 'KES',

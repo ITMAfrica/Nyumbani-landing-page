@@ -7,10 +7,35 @@ import { useI18n } from '@/lib/i18n';
 export function SiteFooter() {
   const { dict } = useI18n();
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  function onSubscribe(e: FormEvent<HTMLFormElement>) {
+  async function onSubscribe(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setSubmitted(true);
+    const form = e.currentTarget;
+    const rawEmail = (form.elements.namedItem('email') as HTMLInputElement | null)?.value?.trim();
+    if (!rawEmail) return;
+    setSubmitting(true);
+    setSubmitError(null);
+    setSubmitted(false);
+    try {
+      const response = await fetch('/api/mail/newsletter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: rawEmail }),
+      });
+      if (!response.ok) {
+        throw new Error('newsletter_submit_failed');
+      }
+      setSubmitted(true);
+      form.reset();
+    } catch {
+      setSubmitError(dict.footer.subscribeFailed);
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -87,19 +112,26 @@ export function SiteFooter() {
                   name="email"
                   type="email"
                   required
+                  disabled={submitting}
                   placeholder={dict.footer.enterEmail}
                   className="min-w-0 flex-1 border border-white/15 bg-white/[0.06] px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-gold/50 focus:outline-none focus:ring-1 focus:ring-gold/30 rounded-lg transition"
                 />
                 <button
                   type="submit"
+                  disabled={submitting}
                   className="shrink-0 bg-gold hover:bg-gold-dark px-6 py-3 text-[11px] font-semibold uppercase tracking-wider text-white transition rounded-lg"
                 >
-                  {dict.footer.subscribe}
+                  {submitting ? dict.footer.subscribing : dict.footer.subscribe}
                 </button>
               </div>
               {submitted ? (
-                  <p className="mt-3 text-xs text-gold" role="status">
+                <p className="mt-3 text-xs text-gold" role="status">
                   {dict.footer.thankYou}
+                </p>
+              ) : null}
+              {submitError ? (
+                <p className="mt-3 text-xs text-red-200" role="alert">
+                  {submitError}
                 </p>
               ) : null}
             </form>

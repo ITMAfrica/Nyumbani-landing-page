@@ -55,6 +55,8 @@ export function HomeView({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalView, setModalView] = useState<'lead' | 'tier'>('tier');
   const [leadThankYou, setLeadThankYou] = useState(false);
+  const [leadSubmitting, setLeadSubmitting] = useState(false);
+  const [leadError, setLeadError] = useState<string | null>(null);
 
   const howWeWorkRef = useRef<HTMLElement>(null);
 
@@ -77,6 +79,7 @@ export function HomeView({
   const openTierModal = useCallback(() => {
     setModalView('tier');
     setLeadThankYou(false);
+    setLeadError(null);
     setIsModalOpen(true);
   }, []);
 
@@ -86,33 +89,52 @@ export function HomeView({
       persistIntroDone();
     }
     setLeadThankYou(false);
+    setLeadError(null);
     setModalView('tier');
   }, [modalView, persistIntroDone]);
 
   const handleLeadSubmit = useCallback(
-    (e: FormEvent<HTMLFormElement>) => {
+    async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       const form = e.currentTarget;
       const rawName = (form.elements.namedItem('lead-name') as HTMLInputElement | null)?.value?.trim();
       const rawEmail = (form.elements.namedItem('lead-email') as HTMLInputElement | null)?.value?.trim();
       if (!rawName || !rawEmail) return;
-      persistIntroDone();
+      setLeadSubmitting(true);
+      setLeadError(null);
       try {
-        localStorage.setItem(
-          'nyumbani_last_lead',
-          JSON.stringify({ name: rawName, email: rawEmail, t: Date.now() }),
-        );
+        const response = await fetch('/api/mail/lead', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name: rawName, email: rawEmail }),
+        });
+        if (!response.ok) {
+          throw new Error('lead_submit_failed');
+        }
+        persistIntroDone();
+        try {
+          localStorage.setItem(
+            'nyumbani_last_lead',
+            JSON.stringify({ name: rawName, email: rawEmail, t: Date.now() }),
+          );
+        } catch {
+          /* ignore */
+        }
+        setLeadThankYou(true);
+        window.setTimeout(() => {
+          setLeadThankYou(false);
+          setModalView('tier');
+          setIsModalOpen(false);
+        }, 2200);
       } catch {
-        /* ignore */
+        setLeadError(dict.modal.sendFailed);
+      } finally {
+        setLeadSubmitting(false);
       }
-      setLeadThankYou(true);
-      window.setTimeout(() => {
-        setLeadThankYou(false);
-        setModalView('tier');
-        setIsModalOpen(false);
-      }, 2200);
     },
-    [persistIntroDone],
+    [dict.modal.sendFailed, persistIntroDone],
   );
 
   useEffect(() => {
@@ -183,7 +205,7 @@ export function HomeView({
 
         {/* Hero Content */}
         <div className="relative z-10 flex-1 flex flex-col justify-center px-8 sm:px-16 lg:px-32 max-w-[1600px] mx-auto w-full">
-          <div className="max-w-xl w-full flex flex-col gap-7 sm:gap-10">
+          <div className="max-w-xl w-full flex flex-col gap-20 sm:gap-28">
             <Link
               href="/"
               className="inline-flex shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black/20 rounded-sm"
@@ -355,6 +377,8 @@ export function HomeView({
         open={isModalOpen}
         view={modalView}
         leadThankYou={leadThankYou}
+        leadSubmitting={leadSubmitting}
+        leadError={leadError}
         modal={dict.modal}
         onClose={closeEnquireModal}
         onLeadSubmit={handleLeadSubmit}

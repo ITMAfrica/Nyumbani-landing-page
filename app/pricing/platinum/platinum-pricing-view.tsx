@@ -4,7 +4,16 @@ import { useI18n } from '@/lib/i18n';
 import { PricingPageLayout, PricingTierCard } from '@/components/pricing-page-layout';
 
 import heroPlatinum from '../../../photos/hero-1.jpg';
-import heroAccent from '../../../photos/hero-2.jpg';
+
+/** Garden City Residence 302 — Platinum townhouses card. */
+const PLATINUM_TOWNHOUSE_GALLERY = [
+  '/api/photo/garden-city-302/IMG_4155.webp',
+  '/api/photo/garden-city-302/IMG_4165.webp',
+  '/api/photo/garden-city-302/IMG_4191.webp',
+  '/api/photo/garden-city-302/IMG_4223.webp',
+  '/api/photo/garden-city-302/IMG_4235.webp',
+  '/api/photo/garden-city-302/IMG_4332.webp',
+] as const;
 
 export function PlatinumPricingView() {
   const { dict } = useI18n();
@@ -64,7 +73,7 @@ export function PlatinumPricingView() {
         </PricingTierCard>
 
         <PricingTierCard
-          image={heroAccent}
+          images={[...PLATINUM_TOWNHOUSE_GALLERY]}
           imageAlt={`${dict.pricing.tierTownhouse} — Nyumbani Platinum`}
           title={dict.pricing.tierTownhouse}
         >
