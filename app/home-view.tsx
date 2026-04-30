@@ -3,10 +3,11 @@
 import { useState, useEffect, useCallback, useRef, type FormEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronRight, X, ChevronDown } from 'lucide-react';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
 import { useI18n } from '@/lib/i18n';
 import type { Dictionary } from '@/lib/dictionaries';
+import { EnquireModal } from '@/components/enquire-modal';
 
 import heroPlatinum from '../photos/hero-1.jpg';
 import heroGold from '../photos/hero-2.jpg';
@@ -22,28 +23,21 @@ function getHeroContent(dict: Dictionary) {
       tagline: dict.hero.platinum.tagline,
       title: dict.hero.platinum.title,
       description: dict.hero.platinum.description,
-      footer: dict.hero.platinum.footer,
       image: heroPlatinum,
     },
     {
       tagline: dict.hero.gold.tagline,
       title: dict.hero.gold.title,
       description: dict.hero.gold.description,
-      footer: dict.hero.gold.footer,
       image: heroGold,
     },
   ];
 }
 
-const glassField =
-  'w-full rounded-xl border border-white/30 bg-white/[0.06] px-4 py-3 text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-sm transition placeholder:text-white/60 focus:border-gold/50 focus:outline-none focus:ring-2 focus:ring-gold/30 font-light';
-
-const glassSelect = `${glassField} appearance-none`;
-
 const INTRO_DONE_KEY = 'nyumbani_intro_done';
 const INTRO_LEGACY_KEY = 'nyumbani_visited';
 
-export function HomeClient({
+export function HomeView({
   initialSearch,
 }: {
   initialSearch: Record<string, string | string[] | undefined>;
@@ -61,7 +55,6 @@ export function HomeClient({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalView, setModalView] = useState<'lead' | 'tier'>('tier');
   const [leadThankYou, setLeadThankYou] = useState(false);
-  const [selectedTier, setSelectedTier] = useState<'gold' | 'platinum' | null>(null);
 
   const howWeWorkRef = useRef<HTMLElement>(null);
 
@@ -130,17 +123,6 @@ export function HomeClient({
   }, []);
 
   useEffect(() => {
-    if (isModalOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isModalOpen]);
-
-  useEffect(() => {
     const onOpen = () => openTierModal();
     window.addEventListener('nyumbani:open-enquire', onOpen);
     return () => window.removeEventListener('nyumbani:open-enquire', onOpen);
@@ -201,10 +183,10 @@ export function HomeClient({
 
         {/* Hero Content */}
         <div className="relative z-10 flex-1 flex flex-col justify-center px-8 sm:px-16 lg:px-32 max-w-[1600px] mx-auto w-full">
-          <div className="max-w-xl w-full">
+          <div className="max-w-xl w-full flex flex-col gap-7 sm:gap-10">
             <Link
               href="/"
-              className="mb-6 sm:mb-8 inline-flex shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black/20 rounded-sm"
+              className="inline-flex shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black/20 rounded-sm"
               aria-label="Nyumbani — accueil"
             >
               <Image
@@ -225,26 +207,22 @@ export function HomeClient({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="text-white"
+              className="text-white flex flex-col gap-6 sm:gap-8"
             >
               <motion.span 
-                className="inline-block text-[11px] sm:text-xs font-semibold uppercase tracking-[0.3em] text-gold mb-4 sm:mb-6"
+                className="inline-block text-[11px] sm:text-xs font-semibold uppercase tracking-[0.3em] text-gold"
               >
                 {HERO_CONTENT[currentImageIndex].tagline}
               </motion.span>
 
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-serif mb-5 sm:mb-7 leading-[1.1] sm:leading-[1.1] font-normal">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-serif leading-[1.1] sm:leading-[1.1] font-normal">
                 {HERO_CONTENT[currentImageIndex].title}
               </h1>
               
-              <p className="text-sm md:text-base font-light opacity-90 leading-relaxed mb-5 sm:mb-7 max-w-lg">
+              <p className="text-sm md:text-base font-light opacity-90 leading-relaxed max-w-lg">
                 {HERO_CONTENT[currentImageIndex].description}
               </p>
-              
-              <p className="text-xs sm:text-sm md:text-base font-medium italic opacity-90 leading-relaxed mb-8 sm:mb-12 max-w-lg border-l-2 border-gold pl-4 sm:pl-5">
-                {HERO_CONTENT[currentImageIndex].footer}
-              </p>
-              
+
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -259,18 +237,25 @@ export function HomeClient({
           </div>
         </div>
 
-        {/* Carousel Indicators */}
-        <div className="absolute z-10 right-8 md:right-16 top-1/2 -translate-y-1/2 flex flex-col items-end gap-6 text-white font-serif text-2xl">
+        {/* Carousel Indicators — bottom row on small screens avoids overlap with hero copy; sidebar from md */}
+        <div className="pointer-events-auto absolute z-20 flex gap-8 text-white font-serif text-xl sm:text-2xl max-md:bottom-[7.25rem] max-md:left-1/2 max-md:right-auto max-md:-translate-x-1/2 max-md:flex-row max-md:flex-nowrap max-md:items-center max-md:justify-center max-md:px-4 md:inset-x-auto md:bottom-auto md:left-auto md:translate-x-0 md:right-8 md:top-1/2 md:-translate-y-1/2 md:flex-col md:items-end md:gap-6 lg:right-16">
           {HERO_CONTENT.map((_, index) => {
             const isActive = index === currentImageIndex;
             return (
               <button
-                key={index} 
+                key={index}
+                type="button"
+                aria-current={isActive ? 'true' : undefined}
+                aria-label={HERO_CONTENT[index].tagline}
                 onClick={() => setCurrentImageIndex(index)}
-                className={`flex items-center gap-4 group cursor-pointer transition-all duration-500 ${isActive ? 'opacity-100' : 'opacity-40 hover:opacity-80'}`}
+                className={`touch-manipulation flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center gap-3 px-2 py-1 [-webkit-tap-highlight-color:transparent] transition-all duration-500 sm:gap-4 md:min-h-0 md:min-w-0 md:justify-start md:p-0 group cursor-pointer ${isActive ? 'opacity-100' : 'opacity-40 hover:opacity-80'}`}
               >
-                <div className={`h-[2px] bg-white transition-all duration-500 ${isActive ? 'w-12' : 'w-0 group-hover:w-8'}`} />
-                <span className={`transition-all duration-300 ${isActive ? 'text-gold' : ''}`}>0{index + 1}</span>
+                <div
+                  className={`hidden h-[2px] bg-white transition-all duration-500 md:block ${isActive ? 'w-10 sm:w-12' : 'w-0 group-hover:w-6 sm:group-hover:w-8'}`}
+                />
+                <span className={`leading-none transition-all duration-300 ${isActive ? 'text-gold' : ''}`}>
+                  0{index + 1}
+                </span>
               </button>
             );
           })}
@@ -356,7 +341,7 @@ export function HomeClient({
             {dict.howWeWork.title}
           </motion.h2>
           
-          <motion.div variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }} className="text-slate-600 font-medium text-lg leading-relaxed mb-6">
+          <motion.div variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }} className="text-slate-600 font-normal text-lg leading-relaxed mb-6">
             {dict.howWeWork.description}
           </motion.div>
           
@@ -366,195 +351,22 @@ export function HomeClient({
         </motion.div>
       </section>
 
-      {/* Contact: Enquire flow — collection cards then form */}
-      <AnimatePresence>
-        {isModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex h-[100dvh] min-h-0 flex-col"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="contact-modal-title"
-          >
-            <div
-              className="absolute inset-0 bg-black/[0.12] backdrop-blur-[2px]"
-              onClick={() => {
-                if (modalView === 'lead' && leadThankYou) return;
-                closeEnquireModal();
-              }}
-              aria-hidden
-            />
-
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 12 }}
-              transition={{ type: 'spring', duration: 0.45, bounce: 0.12 }}
-              className="relative isolate z-10 flex h-full min-h-0 w-full flex-1 flex-col overflow-y-auto border-x border-white/30 bg-white/[0.11] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.22),0_24px_80px_-20px_rgba(0,0,0,0.2)] backdrop-blur-md"
-            >
-              <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-5 py-8 sm:px-10 sm:py-10 lg:max-w-6xl">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (leadThankYou) return;
-                    closeEnquireModal();
-                  }}
-                  disabled={leadThankYou}
-                  className="absolute right-4 top-4 z-20 rounded-full border border-white/35 bg-white/[0.08] p-2 text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.35)] backdrop-blur-sm transition hover:bg-white/15 disabled:pointer-events-none disabled:opacity-40"
-                  aria-label="Close"
-                >
-                  <X size={24} />
-                </button>
-
-                <div className="flex flex-1 flex-col">
-                  <div className="mb-8 max-w-2xl pr-10">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-gold">
-                      {dict.modal.enquire}
-                    </p>
-                    <h3
-                      id="contact-modal-title"
-                      className="mt-2 font-serif text-2xl font-normal text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.4)] sm:text-4xl"
-                    >
-                      {modalView === 'lead'
-                        ? dict.modal.captureTitle
-                        : dict.modal.chooseApproach}
-                    </h3>
-                    <p className="mt-3 text-sm font-light text-white/90 [text-shadow:0_1px_4px_rgba(0,0,0,0.35)]">
-                      {modalView === 'lead'
-                        ? dict.modal.captureSubtitle
-                        : dict.modal.chooseApproachDesc}
-                    </p>
-                  </div>
-
-                  {modalView === 'lead' ? (
-                    leadThankYou ? (
-                      <div className="flex flex-1 flex-col items-start justify-center py-12 sm:py-16">
-                        <p className="font-serif text-2xl text-white sm:text-3xl [text-shadow:0_1px_2px_rgba(0,0,0,0.35)]">
-                          {dict.modal.thankYouContact}
-                        </p>
-                      </div>
-                    ) : (
-                      <form
-                        onSubmit={handleLeadSubmit}
-                        className="flex max-w-md flex-col gap-5 sm:gap-6"
-                        noValidate
-                      >
-                        <div>
-                          <label htmlFor="lead-name" className="sr-only">
-                            {dict.modal.fullName}
-                          </label>
-                          <input
-                            id="lead-name"
-                            name="lead-name"
-                            type="text"
-                            autoComplete="name"
-                            required
-                            placeholder={dict.modal.fullName}
-                            className={glassField}
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="lead-email" className="sr-only">
-                            {dict.modal.email}
-                          </label>
-                          <input
-                            id="lead-email"
-                            name="lead-email"
-                            type="email"
-                            autoComplete="email"
-                            required
-                            placeholder={dict.modal.email}
-                            className={glassField}
-                          />
-                        </div>
-                        <button
-                          type="submit"
-                          className="inline-flex w-fit items-center gap-2 border border-gold/50 bg-gold/15 px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-white backdrop-blur-sm transition hover:bg-gold/25 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/80"
-                        >
-                          {dict.modal.submitContact}
-                          <ChevronRight className="h-3.5 w-3.5" strokeWidth={2} aria-hidden />
-                        </button>
-                      </form>
-                    )
-                  ) : (
-                  <div className="grid flex-1 grid-cols-1 gap-5 sm:min-h-[min(420px,50vh)] sm:grid-cols-2 sm:gap-6">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedTier('gold');
-                        closeEnquireModal();
-                        window.location.href = '/pricing/gold';
-                      }}
-                      className="group relative flex min-h-[280px] overflow-hidden rounded-2xl border border-white/20 text-left shadow-[0_24px_60px_-20px_rgba(0,0,0,0.5)] transition hover:border-gold/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/80 sm:min-h-0"
-                    >
-                      <Image
-                        src={heroGold}
-                        alt="Nyumbani Gold — living collection"
-                        fill
-                        className="object-cover object-center transition duration-700 group-hover:scale-[1.05]"
-                        sizes="(max-width: 640px) 100vw, 50vw"
-                        placeholder="blur"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/10" />
-                      <div className="relative mt-auto flex w-full flex-col gap-3 p-6 sm:p-8">
-                        <div>
-                          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-light">
-                            {dict.modal.livingCollection}
-                          </p>
-                          <p className="mt-1 font-serif text-2xl text-white sm:text-3xl">
-                            {dict.modal.gold}
-                          </p>
-                        </div>
-                          <span className="inline-flex w-fit items-center gap-2 border border-gold/50 bg-gold/15 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-white backdrop-blur-sm transition group-hover:bg-gold/25 rounded-full">
-                            {dict.modal.enquireCta}
-                            <ChevronRight className="h-3.5 w-3.5 opacity-90 transition-transform group-hover:translate-x-0.5" strokeWidth={2} />
-                          </span>
-                      </div>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedTier('platinum');
-                        closeEnquireModal();
-                        window.location.href = '/pricing/platinum';
-                      }}
-                      className="group relative flex min-h-[280px] overflow-hidden rounded-2xl border border-white/20 text-left shadow-[0_24px_60px_-20px_rgba(0,0,0,0.5)] transition hover:border-gold/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/80 sm:min-h-0"
-                    >
-                      <Image
-                        src={heroPlatinum}
-                        alt="Nyumbani Platinum — investment collection"
-                        fill
-                        className="object-cover object-center transition duration-700 group-hover:scale-[1.05]"
-                        sizes="(max-width: 640px) 100vw, 50vw"
-                        placeholder="blur"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/10" />
-                      <div className="relative mt-auto flex w-full flex-col gap-3 p-6 sm:p-8">
-                        <div>
-                          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-light">
-                            {dict.modal.investmentCollection}
-                          </p>
-                          <p className="mt-1 font-serif text-2xl text-white sm:text-3xl">
-                            {dict.modal.platinum}
-                          </p>
-                        </div>
-                        <span className="inline-flex w-fit items-center gap-2 border border-gold/50 bg-gold/15 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-white backdrop-blur-sm transition group-hover:bg-gold/25 rounded-full">
-                            {dict.modal.enquireCta}
-                            <ChevronRight className="h-3.5 w-3.5 opacity-90 transition-transform group-hover:translate-x-0.5" strokeWidth={2} />
-                          </span>
-                      </div>
-                    </button>
-                  </div>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <EnquireModal
+        open={isModalOpen}
+        view={modalView}
+        leadThankYou={leadThankYou}
+        modal={dict.modal}
+        onClose={closeEnquireModal}
+        onLeadSubmit={handleLeadSubmit}
+        onSelectGold={() => {
+          closeEnquireModal();
+          window.location.href = '/pricing/gold';
+        }}
+        onSelectPlatinum={() => {
+          closeEnquireModal();
+          window.location.href = '/pricing/platinum';
+        }}
+      />
     </main>
   );
 }

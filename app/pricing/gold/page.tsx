@@ -1,5 +1,5 @@
-import { PricingGoldClient } from './pricing-gold-client';
+import { GoldPricingView } from './gold-pricing-view';
 
 export default function GoldPricingPage() {
-  return <PricingGoldClient />;
+  return <GoldPricingView />;
 }

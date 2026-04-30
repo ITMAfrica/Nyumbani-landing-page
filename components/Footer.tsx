@@ -67,9 +67,6 @@ export function SiteFooter() {
               <a href="#" className="text-sm font-light text-white/60 transition hover:text-white hover:pl-1">
                 {dict.footer.goldCollection}
               </a>
-              <a href="#" className="text-sm font-light text-white/60 transition hover:text-white hover:pl-1">
-                {dict.footer.investmentPlans}
-              </a>
             </nav>
           </div>
 

@@ -1,5 +1,5 @@
-import { PricingPlatinumClient } from './pricing-platinum-client';
+import { PlatinumPricingView } from './platinum-pricing-view';
 
 export default function PlatinumPricingPage() {
-  return <PricingPlatinumClient />;
+  return <PlatinumPricingView />;
 }

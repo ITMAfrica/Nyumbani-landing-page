@@ -6,13 +6,11 @@ export type Dictionary = {
       tagline: string;
       title: string;
       description: string;
-      footer: string;
     };
     gold: {
       tagline: string;
       title: string;
       description: string;
-      footer: string;
     };
     enquireNow: string;
     scroll: string;
@@ -64,7 +62,6 @@ export type Dictionary = {
     howWeWork: string;
     platinumCollection: string;
     goldCollection: string;
-    investmentPlans: string;
     stayUpdated: string;
     stayUpdatedDesc: string;
     enterEmail: string;
@@ -103,16 +100,12 @@ const en: Dictionary = {
       title: 'Own Nyumbani Platinum Living from $75,000',
       description:
         'Flexible payment plans available crafted to make premium living within reach without compromise. This is your opportunity to secure a home that reflects your standard and builds your long-term value.',
-      footer:
-        'Enquire now and reserve your Nyumbani Platinum unit before prices move up.',
     },
     gold: {
       tagline: 'Nyumbani Gold',
       title: 'Start Smart with Nyumbani Gold from $16,000 | $267/month',
       description:
         "Flexible, interest-free payment plans with zero deposit making it easier than ever to step into property ownership without pressure. Whether you're buying your first home or investing in high-growth areas, Nyumbani Gold puts you ahead.",
-      footer:
-        'Enquire now and lock in your Nyumbani Gold unit before demand drives prices higher.',
     },
     enquireNow: 'Enquire Now',
     scroll: 'Scroll',
@@ -168,7 +161,6 @@ const en: Dictionary = {
     howWeWork: 'How We Work',
     platinumCollection: 'Platinum Collection',
     goldCollection: 'Gold Collection',
-    investmentPlans: 'Investment Plans',
     stayUpdated: 'Stay Updated',
     stayUpdatedDesc:
       'Get the latest investment opportunities delivered to your inbox.',
@@ -209,16 +201,12 @@ const fr: Dictionary = {
       title: 'Possédez Nyumbani Platinum à partir de 75 000 $',
       description:
         'Des plans de paiement flexibles conçus pour rendre la vie premium accessible sans compromis. C’est votre opportunité de sécuriser un foyer qui reflète vos standards et renforce votre valeur à long terme.',
-      footer:
-        'Renseignez-vous maintenant et réservez votre unité Nyumbani Platinum avant la hausse des prix.',
     },
     gold: {
       tagline: 'Nyumbani Gold',
       title: 'Commencez malin avec Nyumbani Gold à partir de 16 000 $ | 267 $/mois',
       description:
         "Des plans de paiement flexibles sans intérêt et sans dépôt, facilitant l'accès à la propriété immobilière sans pression. Que vous achetiez votre première maison ou investissiez dans des zones à forte croissance, Nyumbani Gold vous met en avance.",
-      footer:
-        'Renseignez-vous maintenant et sécurisez votre unité Nyumbani Gold avant que la demande ne fasse monter les prix.',
     },
     enquireNow: "S'enquérir",
     scroll: 'Défiler',
@@ -275,7 +263,6 @@ const fr: Dictionary = {
     howWeWork: 'Comment nous travaillons',
     platinumCollection: 'Collection Platinum',
     goldCollection: 'Collection Gold',
-    investmentPlans: "Plans d'investissement",
     stayUpdated: 'Restez informé',
     stayUpdatedDesc:
       'Recevez les dernières opportunités d’investissement directement dans votre boîte mail.',

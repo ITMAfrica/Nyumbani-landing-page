@@ -8,7 +8,7 @@ import { Images } from 'lucide-react';
 import { getApartmentBySlug } from '@/lib/apartments';
 import { useI18n } from '@/lib/i18n';
 
-export function ApartmentGalleryClient({ slug }: { slug: string }) {
+export function ApartmentGalleryView({ slug }: { slug: string }) {
   const { dict } = useI18n();
   const apt = slug ? getApartmentBySlug(slug) : undefined;
   const [files, setFiles] = useState<string[] | null>(null);

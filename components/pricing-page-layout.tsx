@@ -4,7 +4,7 @@ import Image, { type StaticImageData } from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
-type PricingPageShellProps = {
+type PricingPageLayoutProps = {
   heroImage: StaticImageData;
   heroAlt: string;
   homeHref: string;
@@ -15,7 +15,7 @@ type PricingPageShellProps = {
   children: React.ReactNode;
 };
 
-export function PricingPageShell({
+export function PricingPageLayout({
   heroImage,
   heroAlt,
   homeHref,
@@ -24,7 +24,7 @@ export function PricingPageShell({
   title,
   subtitle,
   children,
-}: PricingPageShellProps) {
+}: PricingPageLayoutProps) {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 antialiased">
       <section className="relative isolate min-h-[min(420px,52vh)] w-full overflow-hidden bg-slate-900">
