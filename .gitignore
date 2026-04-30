@@ -1,11 +1,8 @@
 node_modules/
 .next/
-# Copies JPEG/PNG générées par image-optimizer --apply (garder le rapport, pas le backup lourd)
-image-optimizer/backup/
+
 coverage/
 .DS_Store
 *.log
 .env*
 !.env.example
-
-.image-optimizer
