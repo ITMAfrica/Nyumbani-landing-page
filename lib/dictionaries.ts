@@ -31,12 +31,16 @@ export type Dictionary = {
     livingCollection: string;
     investmentCollection: string;
     gold: string;
-    premium: string;
+    platinum: string;
     enquireCta: string;
+    captureTitle: string;
+    captureSubtitle: string;
+    submitContact: string;
+    thankYouContact: string;
     backToCollections: string;
     requestInfo: string;
     goldLiving: string;
-    premiumInvestment: string;
+    platinumInvestment: string;
     leaveDetails: string;
     preferredLanguage: string;
     fullName: string;
@@ -77,6 +81,19 @@ export type Dictionary = {
     photos: string;
     view: string;
   };
+  pricing: {
+    Kes: string;
+    Usd: string;
+    from: string;
+    tierStudio: string;
+    tier1Bed: string;
+    tier2Bed: string;
+    tier3Bed: string;
+    tierTownhouse: string;
+    descriptionHeading: string;
+    generalAmenitiesHeading: string;
+    amenitiesBody: string;
+  };
 };
 
 const en: Dictionary = {
@@ -113,16 +130,21 @@ const en: Dictionary = {
     enquire: 'Enquire',
     chooseApproach: 'Choose your approach',
     chooseApproachDesc:
-      'Select Nyumbani Gold or Premium to continue with your request.',
+      'Select Nyumbani Gold or Nyumbani Platinum to continue with your request.',
     livingCollection: 'Living collection',
     investmentCollection: 'Investment collection',
     gold: 'Nyumbani Gold',
-    premium: 'Premium',
+    platinum: 'Nyumbani Platinum',
     enquireCta: 'Enquire',
+    captureTitle: 'Welcome to Nyumbani',
+    captureSubtitle:
+      'Share your name and email—we will get in touch with tailored Gold and Platinum options.',
+    submitContact: 'Send',
+    thankYouContact: 'Thank you. Our team will contact you shortly.',
     backToCollections: 'Back to collections',
     requestInfo: 'Request Information',
     goldLiving: 'Nyumbani Gold — Living collection',
-    premiumInvestment: 'Premium — Investment collection',
+    platinumInvestment: 'Nyumbani Platinum — Investment collection',
     leaveDetails: 'Leave your details and our team will contact you shortly.',
     preferredLanguage: 'Preferred Language / Langue',
     fullName: 'Full Name',
@@ -164,6 +186,20 @@ const en: Dictionary = {
     photos: 'photo(s) — click any image for full size',
     view: 'View',
   },
+  pricing: {
+    Kes: 'KES',
+    Usd: 'USD',
+    from: 'from',
+    tierStudio: 'Studios',
+    tier1Bed: '1 Bedroom',
+    tier2Bed: '2 Bedroom',
+    tier3Bed: '3 Bedroom',
+    tierTownhouse: 'Townhouses',
+    descriptionHeading: 'Description',
+    generalAmenitiesHeading: 'General Amenities',
+    amenitiesBody:
+      'CCTV surveillance, chill spots, ample parking, elevators, rooftopia, swimming pool, cascading gardens, community centre, common area generator, borehole water, access control, step-up terraces.',
+  },
 };
 
 const fr: Dictionary = {
@@ -200,16 +236,21 @@ const fr: Dictionary = {
     enquire: "S'enquérir",
     chooseApproach: 'Choisissez votre approche',
     chooseApproachDesc:
-      'Sélectionnez Nyumbani Gold ou Premium pour continuer votre demande.',
+      'Sélectionnez Nyumbani Gold ou Nyumbani Platinum pour continuer votre demande.',
     livingCollection: 'Collection résidentielle',
     investmentCollection: "Collection d'investissement",
     gold: 'Nyumbani Gold',
-    premium: 'Premium',
+    platinum: 'Nyumbani Platinum',
     enquireCta: "S'enquérir",
+    captureTitle: 'Bienvenue chez Nyumbani',
+    captureSubtitle:
+      'Indiquez votre nom et votre adresse e-mail — nous vous recontacterons avec des offres Gold et Platinum adaptées.',
+    submitContact: 'Envoyer',
+    thankYouContact: 'Merci. Notre équipe vous contactera sous peu.',
     backToCollections: 'Retour aux collections',
     requestInfo: "Demander des informations",
     goldLiving: 'Nyumbani Gold — Collection résidentielle',
-    premiumInvestment: "Premium — Collection d'investissement",
+    platinumInvestment: "Nyumbani Platinum — Collection d'investissement",
     leaveDetails:
       'Laissez vos coordonnées et notre équipe vous contactera sous peu.',
     preferredLanguage: 'Langue préférée / Language',
@@ -251,6 +292,20 @@ const fr: Dictionary = {
     home: 'Accueil',
     photos: 'photo(s) — cliquez sur une image pour la taille réelle',
     view: 'Voir',
+  },
+  pricing: {
+    Kes: 'KES',
+    Usd: 'USD',
+    from: 'à partir de',
+    tierStudio: 'Studios',
+    tier1Bed: '1 chambre',
+    tier2Bed: '2 chambres',
+    tier3Bed: '3 chambres',
+    tierTownhouse: 'Maisons de ville',
+    descriptionHeading: 'Description',
+    generalAmenitiesHeading: 'Commodités générales',
+    amenitiesBody:
+      'Vidéosurveillance, espaces détente, parking généreux, ascenseurs, rooftopia, piscine, jardins en cascade, centre communautaire, groupe électrogène pour les espaces communs, forage, contrôle d’accès, terrasses étagées.',
   },
 };
 

@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, type FormEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, ChevronRight, X, ChevronDown } from 'lucide-react';
+import { ChevronRight, X, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
 import { useI18n } from '@/lib/i18n';
 import type { Dictionary } from '@/lib/dictionaries';
@@ -40,15 +40,27 @@ const glassField =
 
 const glassSelect = `${glassField} appearance-none`;
 
+const INTRO_DONE_KEY = 'nyumbani_intro_done';
+const INTRO_LEGACY_KEY = 'nyumbani_visited';
+
 export function HomeClient({
   initialSearch,
 }: {
   initialSearch: Record<string, string | string[] | undefined>;
 }) {
+  const enquireParam =
+    typeof initialSearch.enquire === 'string'
+      ? initialSearch.enquire
+      : Array.isArray(initialSearch.enquire)
+        ? initialSearch.enquire[0]
+        : undefined;
+
   const { dict } = useI18n();
   const HERO_CONTENT = getHeroContent(dict);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalView, setModalView] = useState<'lead' | 'tier'>('tier');
+  const [leadThankYou, setLeadThankYou] = useState(false);
   const [selectedTier, setSelectedTier] = useState<'gold' | 'platinum' | null>(null);
 
   const howWeWorkRef = useRef<HTMLElement>(null);
@@ -60,13 +72,55 @@ export function HomeClient({
   const parallaxY1 = useTransform(howWeWorkProgress, [0, 1], ['-15%', '15%']);
   const parallaxY2 = useTransform(howWeWorkProgress, [0, 1], ['10%', '-10%']);
 
-  const openEnquireModal = useCallback(() => {
+  const persistIntroDone = useCallback(() => {
+    try {
+      localStorage.setItem(INTRO_DONE_KEY, '1');
+      localStorage.removeItem(INTRO_LEGACY_KEY);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const openTierModal = useCallback(() => {
+    setModalView('tier');
+    setLeadThankYou(false);
     setIsModalOpen(true);
   }, []);
 
   const closeEnquireModal = useCallback(() => {
     setIsModalOpen(false);
-  }, []);
+    if (modalView === 'lead') {
+      persistIntroDone();
+    }
+    setLeadThankYou(false);
+    setModalView('tier');
+  }, [modalView, persistIntroDone]);
+
+  const handleLeadSubmit = useCallback(
+    (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      const form = e.currentTarget;
+      const rawName = (form.elements.namedItem('lead-name') as HTMLInputElement | null)?.value?.trim();
+      const rawEmail = (form.elements.namedItem('lead-email') as HTMLInputElement | null)?.value?.trim();
+      if (!rawName || !rawEmail) return;
+      persistIntroDone();
+      try {
+        localStorage.setItem(
+          'nyumbani_last_lead',
+          JSON.stringify({ name: rawName, email: rawEmail, t: Date.now() }),
+        );
+      } catch {
+        /* ignore */
+      }
+      setLeadThankYou(true);
+      window.setTimeout(() => {
+        setLeadThankYou(false);
+        setModalView('tier');
+        setIsModalOpen(false);
+      }, 2200);
+    },
+    [persistIntroDone],
+  );
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -87,25 +141,34 @@ export function HomeClient({
   }, [isModalOpen]);
 
   useEffect(() => {
-    const onOpen = () => openEnquireModal();
+    const onOpen = () => openTierModal();
     window.addEventListener('nyumbani:open-enquire', onOpen);
     return () => window.removeEventListener('nyumbani:open-enquire', onOpen);
-  }, [openEnquireModal]);
+  }, [openTierModal]);
 
   useEffect(() => {
-    const enquire =
-      typeof initialSearch.enquire === 'string'
-        ? initialSearch.enquire
-        : Array.isArray(initialSearch.enquire)
-          ? initialSearch.enquire[0]
-          : undefined;
-    if (enquire !== '1') return;
+    if (enquireParam === '1') return;
+    try {
+      if (localStorage.getItem(INTRO_DONE_KEY) || localStorage.getItem(INTRO_LEGACY_KEY)) return;
+      const timer = window.setTimeout(() => {
+        setModalView('lead');
+        setLeadThankYou(false);
+        setIsModalOpen(true);
+      }, 1500);
+      return () => clearTimeout(timer);
+    } catch {
+      /* localStorage unavailable */
+    }
+  }, [enquireParam]);
+
+  useEffect(() => {
+    if (enquireParam !== '1') return;
 
     queueMicrotask(() => {
-      openEnquireModal();
+      openTierModal();
       window.history.replaceState(null, '', '/');
     });
-  }, [openEnquireModal, initialSearch]);
+  }, [enquireParam, openTierModal]);
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
@@ -185,7 +248,7 @@ export function HomeClient({
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={openEnquireModal}
+              onClick={openTierModal}
               className="hidden sm:inline-flex items-center gap-2 border border-white/30 bg-white/10 backdrop-blur-sm text-white text-[10px] font-semibold tracking-wider uppercase px-6 py-2.5 rounded-full transition hover:bg-white/20 hover:border-white/50"
             >
               {dict.hero.enquireNow}
@@ -317,7 +380,10 @@ export function HomeClient({
           >
             <div
               className="absolute inset-0 bg-black/[0.12] backdrop-blur-[2px]"
-              onClick={closeEnquireModal}
+              onClick={() => {
+                if (modalView === 'lead' && leadThankYou) return;
+                closeEnquireModal();
+              }}
               aria-hidden
             />
 
@@ -331,8 +397,12 @@ export function HomeClient({
               <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-5 py-8 sm:px-10 sm:py-10 lg:max-w-6xl">
                 <button
                   type="button"
-                  onClick={closeEnquireModal}
-                  className="absolute right-4 top-4 z-20 rounded-full border border-white/35 bg-white/[0.08] p-2 text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.35)] backdrop-blur-sm transition hover:bg-white/15"
+                  onClick={() => {
+                    if (leadThankYou) return;
+                    closeEnquireModal();
+                  }}
+                  disabled={leadThankYou}
+                  className="absolute right-4 top-4 z-20 rounded-full border border-white/35 bg-white/[0.08] p-2 text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.35)] backdrop-blur-sm transition hover:bg-white/15 disabled:pointer-events-none disabled:opacity-40"
                   aria-label="Close"
                 >
                   <X size={24} />
@@ -347,13 +417,68 @@ export function HomeClient({
                       id="contact-modal-title"
                       className="mt-2 font-serif text-2xl font-normal text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.4)] sm:text-4xl"
                     >
-                      {dict.modal.chooseApproach}
+                      {modalView === 'lead'
+                        ? dict.modal.captureTitle
+                        : dict.modal.chooseApproach}
                     </h3>
                     <p className="mt-3 text-sm font-light text-white/90 [text-shadow:0_1px_4px_rgba(0,0,0,0.35)]">
-                      {dict.modal.chooseApproachDesc}
+                      {modalView === 'lead'
+                        ? dict.modal.captureSubtitle
+                        : dict.modal.chooseApproachDesc}
                     </p>
                   </div>
 
+                  {modalView === 'lead' ? (
+                    leadThankYou ? (
+                      <div className="flex flex-1 flex-col items-start justify-center py-12 sm:py-16">
+                        <p className="font-serif text-2xl text-white sm:text-3xl [text-shadow:0_1px_2px_rgba(0,0,0,0.35)]">
+                          {dict.modal.thankYouContact}
+                        </p>
+                      </div>
+                    ) : (
+                      <form
+                        onSubmit={handleLeadSubmit}
+                        className="flex max-w-md flex-col gap-5 sm:gap-6"
+                        noValidate
+                      >
+                        <div>
+                          <label htmlFor="lead-name" className="sr-only">
+                            {dict.modal.fullName}
+                          </label>
+                          <input
+                            id="lead-name"
+                            name="lead-name"
+                            type="text"
+                            autoComplete="name"
+                            required
+                            placeholder={dict.modal.fullName}
+                            className={glassField}
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="lead-email" className="sr-only">
+                            {dict.modal.email}
+                          </label>
+                          <input
+                            id="lead-email"
+                            name="lead-email"
+                            type="email"
+                            autoComplete="email"
+                            required
+                            placeholder={dict.modal.email}
+                            className={glassField}
+                          />
+                        </div>
+                        <button
+                          type="submit"
+                          className="inline-flex w-fit items-center gap-2 border border-gold/50 bg-gold/15 px-6 py-3 text-[10px] font-semibold uppercase tracking-widest text-white backdrop-blur-sm transition hover:bg-gold/25 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/80"
+                        >
+                          {dict.modal.submitContact}
+                          <ChevronRight className="h-3.5 w-3.5" strokeWidth={2} aria-hidden />
+                        </button>
+                      </form>
+                    )
+                  ) : (
                   <div className="grid flex-1 grid-cols-1 gap-5 sm:min-h-[min(420px,50vh)] sm:grid-cols-2 sm:gap-6">
                     <button
                       type="button"
@@ -413,7 +538,7 @@ export function HomeClient({
                             {dict.modal.investmentCollection}
                           </p>
                           <p className="mt-1 font-serif text-2xl text-white sm:text-3xl">
-                            {dict.modal.premium}
+                            {dict.modal.platinum}
                           </p>
                         </div>
                         <span className="inline-flex w-fit items-center gap-2 border border-gold/50 bg-gold/15 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-white backdrop-blur-sm transition group-hover:bg-gold/25 rounded-full">
@@ -423,6 +548,7 @@ export function HomeClient({
                       </div>
                     </button>
                   </div>
+                  )}
                 </div>
               </div>
             </motion.div>
