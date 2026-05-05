@@ -6,13 +6,11 @@ export type Dictionary = {
       tagline: string;
       title: string;
       description: string;
-      footer: string;
     };
     gold: {
       tagline: string;
       title: string;
       description: string;
-      footer: string;
     };
     enquireNow: string;
     scroll: string;
@@ -36,6 +34,8 @@ export type Dictionary = {
     captureTitle: string;
     captureSubtitle: string;
     submitContact: string;
+    submitting: string;
+    sendFailed: string;
     thankYouContact: string;
     backToCollections: string;
     requestInfo: string;
@@ -64,11 +64,12 @@ export type Dictionary = {
     howWeWork: string;
     platinumCollection: string;
     goldCollection: string;
-    investmentPlans: string;
     stayUpdated: string;
     stayUpdatedDesc: string;
     enterEmail: string;
     subscribe: string;
+    subscribing: string;
+    subscribeFailed: string;
     thankYou: string;
     followUs: string;
     privacyPolicy: string;
@@ -80,6 +81,10 @@ export type Dictionary = {
     home: string;
     photos: string;
     view: string;
+    expandPhotoAria: string;
+    lightboxClose: string;
+    lightboxPrev: string;
+    lightboxNext: string;
   };
   pricing: {
     Kes: string;
@@ -103,16 +108,12 @@ const en: Dictionary = {
       title: 'Own Nyumbani Platinum Living from $75,000',
       description:
         'Flexible payment plans available crafted to make premium living within reach without compromise. This is your opportunity to secure a home that reflects your standard and builds your long-term value.',
-      footer:
-        'Enquire now and reserve your Nyumbani Platinum unit before prices move up.',
     },
     gold: {
       tagline: 'Nyumbani Gold',
       title: 'Start Smart with Nyumbani Gold from $16,000 | $267/month',
       description:
         "Flexible, interest-free payment plans with zero deposit making it easier than ever to step into property ownership without pressure. Whether you're buying your first home or investing in high-growth areas, Nyumbani Gold puts you ahead.",
-      footer:
-        'Enquire now and lock in your Nyumbani Gold unit before demand drives prices higher.',
     },
     enquireNow: 'Enquire Now',
     scroll: 'Scroll',
@@ -140,6 +141,8 @@ const en: Dictionary = {
     captureSubtitle:
       'Share your name and email—we will get in touch with tailored Gold and Platinum options.',
     submitContact: 'Send',
+    submitting: 'Sending...',
+    sendFailed: 'We could not send your request right now. Please try again.',
     thankYouContact: 'Thank you. Our team will contact you shortly.',
     backToCollections: 'Back to collections',
     requestInfo: 'Request Information',
@@ -168,12 +171,13 @@ const en: Dictionary = {
     howWeWork: 'How We Work',
     platinumCollection: 'Platinum Collection',
     goldCollection: 'Gold Collection',
-    investmentPlans: 'Investment Plans',
     stayUpdated: 'Stay Updated',
     stayUpdatedDesc:
       'Get the latest investment opportunities delivered to your inbox.',
     enterEmail: 'Enter your email*',
     subscribe: 'Subscribe',
+    subscribing: 'Sending...',
+    subscribeFailed: 'We could not submit your email right now. Please try again.',
     thankYou: 'Thank you. We have received your email.',
     followUs: 'Follow Us',
     privacyPolicy: 'Privacy Policy',
@@ -185,6 +189,10 @@ const en: Dictionary = {
     home: 'Home',
     photos: 'photo(s) — click any image for full size',
     view: 'View',
+    expandPhotoAria: 'Open full-screen photo',
+    lightboxClose: 'Close gallery',
+    lightboxPrev: 'Previous photo',
+    lightboxNext: 'Next photo',
   },
   pricing: {
     Kes: 'KES',
@@ -209,16 +217,12 @@ const fr: Dictionary = {
       title: 'Possédez Nyumbani Platinum à partir de 75 000 $',
       description:
         'Des plans de paiement flexibles conçus pour rendre la vie premium accessible sans compromis. C’est votre opportunité de sécuriser un foyer qui reflète vos standards et renforce votre valeur à long terme.',
-      footer:
-        'Renseignez-vous maintenant et réservez votre unité Nyumbani Platinum avant la hausse des prix.',
     },
     gold: {
       tagline: 'Nyumbani Gold',
       title: 'Commencez malin avec Nyumbani Gold à partir de 16 000 $ | 267 $/mois',
       description:
         "Des plans de paiement flexibles sans intérêt et sans dépôt, facilitant l'accès à la propriété immobilière sans pression. Que vous achetiez votre première maison ou investissiez dans des zones à forte croissance, Nyumbani Gold vous met en avance.",
-      footer:
-        'Renseignez-vous maintenant et sécurisez votre unité Nyumbani Gold avant que la demande ne fasse monter les prix.',
     },
     enquireNow: "S'enquérir",
     scroll: 'Défiler',
@@ -246,6 +250,8 @@ const fr: Dictionary = {
     captureSubtitle:
       'Indiquez votre nom et votre adresse e-mail — nous vous recontacterons avec des offres Gold et Platinum adaptées.',
     submitContact: 'Envoyer',
+    submitting: 'Envoi...',
+    sendFailed: "Nous n'avons pas pu envoyer votre demande pour le moment. Veuillez reessayer.",
     thankYouContact: 'Merci. Notre équipe vous contactera sous peu.',
     backToCollections: 'Retour aux collections',
     requestInfo: "Demander des informations",
@@ -275,12 +281,13 @@ const fr: Dictionary = {
     howWeWork: 'Comment nous travaillons',
     platinumCollection: 'Collection Platinum',
     goldCollection: 'Collection Gold',
-    investmentPlans: "Plans d'investissement",
     stayUpdated: 'Restez informé',
     stayUpdatedDesc:
       'Recevez les dernières opportunités d’investissement directement dans votre boîte mail.',
     enterEmail: 'Entrez votre e-mail*',
     subscribe: "S'abonner",
+    subscribing: 'Envoi...',
+    subscribeFailed: "Nous n'avons pas pu soumettre votre e-mail pour le moment. Veuillez reessayer.",
     thankYou: 'Merci. Nous avons bien reçu votre e-mail.',
     followUs: 'Suivez-nous',
     privacyPolicy: 'Politique de confidentialité',
@@ -292,6 +299,10 @@ const fr: Dictionary = {
     home: 'Accueil',
     photos: 'photo(s) — cliquez sur une image pour la taille réelle',
     view: 'Voir',
+    expandPhotoAria: 'Ouvrir la photo en plein écran',
+    lightboxClose: 'Fermer la galerie',
+    lightboxPrev: 'Photo précédente',
+    lightboxNext: 'Photo suivante',
   },
   pricing: {
     Kes: 'KES',

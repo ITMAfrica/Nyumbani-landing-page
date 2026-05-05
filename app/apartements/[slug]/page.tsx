@@ -1,4 +1,4 @@
-import { ApartmentGalleryClient } from './apartment-gallery-client';
+import { ApartmentGalleryView } from './apartment-gallery-view';
 
 export default async function ApartmentGalleryPage({
   params,
@@ -6,5 +6,5 @@ export default async function ApartmentGalleryPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  return <ApartmentGalleryClient slug={slug} />;
+  return <ApartmentGalleryView slug={slug} />;
 }

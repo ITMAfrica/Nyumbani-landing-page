@@ -1,4 +1,4 @@
-import { HomeClient } from './home-client';
+import { HomeView } from './home-view';
 
 export default async function Page({
   searchParams,
@@ -6,5 +6,5 @@ export default async function Page({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const initialSearch = await searchParams;
-  return <HomeClient initialSearch={initialSearch} />;
+  return <HomeView initialSearch={initialSearch} />;
 }
