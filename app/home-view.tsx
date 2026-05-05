@@ -1,21 +1,27 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback, useRef, type FormEvent } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { ChevronRight, ChevronDown } from 'lucide-react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
-import { useI18n } from '@/lib/i18n';
-import type { Dictionary } from '@/lib/dictionaries';
-import { EnquireModal } from '@/components/enquire-modal';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  type FormEvent,
+} from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { ChevronRight, ChevronDown } from "lucide-react";
+import { motion, AnimatePresence, useScroll, useTransform } from "motion/react";
+import { useI18n } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/dictionaries";
+import { EnquireModal } from "@/components/enquire-modal";
 
-import heroPlatinum from '../photos/hero-1.jpg';
-import heroGold from '../photos/hero-2.jpg';
-import sectionVillaTop from '../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_5001.webp';
-import sectionVillaBottom from '../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4450.webp';
+import heroPlatinum from "../photos/hero-1.jpg";
+import heroGold from "../photos/hero-2.jpg";
+import sectionVillaTop from "../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_5001.webp";
+import sectionVillaBottom from "../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4450.webp";
 
 const HERO_LOGO_URL =
-  'https://auzyjcdanenhoqyrbjxg.supabase.co/storage/v1/object/public/images/users/7a23a808-8309-4bff-b922-1a9db7482400/e38b6f4a-4227-48e6-8f6d-b3acea7daa8c.png';
+  "https://auzyjcdanenhoqyrbjxg.supabase.co/storage/v1/object/public/images/users/7a23a808-8309-4bff-b922-1a9db7482400/e38b6f4a-4227-48e6-8f6d-b3acea7daa8c.png";
 
 function getHeroContent(dict: Dictionary) {
   return [
@@ -34,8 +40,8 @@ function getHeroContent(dict: Dictionary) {
   ];
 }
 
-const INTRO_DONE_KEY = 'nyumbani_intro_done';
-const INTRO_LEGACY_KEY = 'nyumbani_visited';
+const INTRO_DONE_KEY = "nyumbani_intro_done";
+const INTRO_LEGACY_KEY = "nyumbani_visited";
 
 export function HomeView({
   initialSearch,
@@ -43,7 +49,7 @@ export function HomeView({
   initialSearch: Record<string, string | string[] | undefined>;
 }) {
   const enquireParam =
-    typeof initialSearch.enquire === 'string'
+    typeof initialSearch.enquire === "string"
       ? initialSearch.enquire
       : Array.isArray(initialSearch.enquire)
         ? initialSearch.enquire[0]
@@ -53,7 +59,6 @@ export function HomeView({
   const HERO_CONTENT = getHeroContent(dict);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalView, setModalView] = useState<'lead' | 'tier'>('tier');
   const [leadThankYou, setLeadThankYou] = useState(false);
   const [leadSubmitting, setLeadSubmitting] = useState(false);
   const [leadError, setLeadError] = useState<string | null>(null);
@@ -62,22 +67,21 @@ export function HomeView({
 
   const { scrollYProgress: howWeWorkProgress } = useScroll({
     target: howWeWorkRef,
-    offset: ['start end', 'end start'],
+    offset: ["start end", "end start"],
   });
-  const parallaxY1 = useTransform(howWeWorkProgress, [0, 1], ['-15%', '15%']);
-  const parallaxY2 = useTransform(howWeWorkProgress, [0, 1], ['10%', '-10%']);
+  const parallaxY1 = useTransform(howWeWorkProgress, [0, 1], ["-15%", "15%"]);
+  const parallaxY2 = useTransform(howWeWorkProgress, [0, 1], ["10%", "-10%"]);
 
   const persistIntroDone = useCallback(() => {
     try {
-      localStorage.setItem(INTRO_DONE_KEY, '1');
+      localStorage.setItem(INTRO_DONE_KEY, "1");
       localStorage.removeItem(INTRO_LEGACY_KEY);
     } catch {
       /* ignore */
     }
   }, []);
 
-  const openTierModal = useCallback(() => {
-    setModalView('tier');
+  const openModal = useCallback(() => {
     setLeadThankYou(false);
     setLeadError(null);
     setIsModalOpen(true);
@@ -85,56 +89,48 @@ export function HomeView({
 
   const closeEnquireModal = useCallback(() => {
     setIsModalOpen(false);
-    if (modalView === 'lead') {
-      persistIntroDone();
-    }
     setLeadThankYou(false);
     setLeadError(null);
-    setModalView('tier');
-  }, [modalView, persistIntroDone]);
+  }, []);
 
   const handleLeadSubmit = useCallback(
-    async (e: FormEvent<HTMLFormElement>) => {
+    async (e: FormEvent<HTMLFormElement>, tier: "gold" | "platinum") => {
       e.preventDefault();
       const form = e.currentTarget;
-      const rawName = (form.elements.namedItem('lead-name') as HTMLInputElement | null)?.value?.trim();
-      const rawEmail = (form.elements.namedItem('lead-email') as HTMLInputElement | null)?.value?.trim();
+      const rawName = (
+        form.elements.namedItem("lead-name") as HTMLInputElement | null
+      )?.value?.trim();
+      const rawEmail = (
+        form.elements.namedItem("lead-email") as HTMLInputElement | null
+      )?.value?.trim();
+      const rawPhone = (
+        form.elements.namedItem("lead-phone") as HTMLInputElement | null
+      )?.value?.trim();
+      const rawPlan = (
+        form.elements.namedItem("lead-plan") as HTMLSelectElement | null
+      )?.value;
+      const rawReason = (
+        form.elements.namedItem("lead-reason") as HTMLSelectElement | null
+      )?.value;
       if (!rawName || !rawEmail) return;
       setLeadSubmitting(true);
       setLeadError(null);
-      try {
-        const response = await fetch('/api/mail/lead', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ name: rawName, email: rawEmail }),
-        });
-        if (!response.ok) {
-          throw new Error('lead_submit_failed');
+
+      // TODO: replace with API call once backend is ready
+      persistIntroDone();
+      setLeadThankYou(true);
+      window.setTimeout(() => {
+        setLeadThankYou(false);
+        setIsModalOpen(false);
+        if (tier === "gold") {
+          window.location.href = "/pricing/gold";
+        } else if (tier === "platinum") {
+          window.location.href = "/pricing/platinum";
         }
-        persistIntroDone();
-        try {
-          localStorage.setItem(
-            'nyumbani_last_lead',
-            JSON.stringify({ name: rawName, email: rawEmail, t: Date.now() }),
-          );
-        } catch {
-          /* ignore */
-        }
-        setLeadThankYou(true);
-        window.setTimeout(() => {
-          setLeadThankYou(false);
-          setModalView('tier');
-          setIsModalOpen(false);
-        }, 2200);
-      } catch {
-        setLeadError(dict.modal.sendFailed);
-      } finally {
-        setLeadSubmitting(false);
-      }
+      }, 1500);
+      setLeadSubmitting(false);
     },
-    [dict.modal.sendFailed, persistIntroDone],
+    [persistIntroDone],
   );
 
   useEffect(() => {
@@ -145,34 +141,36 @@ export function HomeView({
   }, []);
 
   useEffect(() => {
-    const onOpen = () => openTierModal();
-    window.addEventListener('nyumbani:open-enquire', onOpen);
-    return () => window.removeEventListener('nyumbani:open-enquire', onOpen);
-  }, [openTierModal]);
+    const onOpen = () => openModal();
+    window.addEventListener("nyumbani:open-enquire", onOpen);
+    return () => window.removeEventListener("nyumbani:open-enquire", onOpen);
+  }, [openModal]);
 
   useEffect(() => {
-    if (enquireParam === '1') return;
+    if (enquireParam === "1") return;
     try {
-      if (localStorage.getItem(INTRO_DONE_KEY) || localStorage.getItem(INTRO_LEGACY_KEY)) return;
+      if (
+        localStorage.getItem(INTRO_DONE_KEY) ||
+        localStorage.getItem(INTRO_LEGACY_KEY)
+      )
+        return;
       const timer = window.setTimeout(() => {
-        setModalView('lead');
-        setLeadThankYou(false);
-        setIsModalOpen(true);
+        openModal();
       }, 1500);
       return () => clearTimeout(timer);
     } catch {
       /* localStorage unavailable */
     }
-  }, [enquireParam]);
+  }, [enquireParam, openModal]);
 
   useEffect(() => {
-    if (enquireParam !== '1') return;
+    if (enquireParam !== "1") return;
 
     queueMicrotask(() => {
-      openTierModal();
-      window.history.replaceState(null, '', '/');
+      openModal();
+      window.history.replaceState(null, "", "/");
     });
-  }, [enquireParam, openTierModal]);
+  }, [enquireParam, openModal]);
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
@@ -222,40 +220,38 @@ export function HomeView({
                 referrerPolicy="no-referrer"
               />
             </Link>
-          <AnimatePresence mode="wait">
-            <motion.div 
-              key={currentImageIndex}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="text-white flex flex-col gap-6 sm:gap-8"
-            >
-              <motion.span 
-                className="inline-block text-[11px] sm:text-xs font-semibold uppercase tracking-[0.3em] text-gold"
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentImageIndex}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="text-white flex flex-col gap-6 sm:gap-8"
               >
-                {HERO_CONTENT[currentImageIndex].tagline}
-              </motion.span>
+                <motion.span className="inline-block text-[11px] sm:text-xs font-semibold uppercase tracking-[0.3em] text-gold">
+                  {HERO_CONTENT[currentImageIndex].tagline}
+                </motion.span>
 
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-serif leading-[1.1] sm:leading-[1.1] font-normal">
-                {HERO_CONTENT[currentImageIndex].title}
-              </h1>
-              
-              <p className="text-sm md:text-base font-light opacity-90 leading-relaxed max-w-lg">
-                {HERO_CONTENT[currentImageIndex].description}
-              </p>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-serif leading-[1.1] sm:leading-[1.1] font-normal">
+                  {HERO_CONTENT[currentImageIndex].title}
+                </h1>
 
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={openTierModal}
-              className="hidden sm:inline-flex items-center gap-2 border border-white/30 bg-white/10 backdrop-blur-sm text-white text-[10px] font-semibold tracking-wider uppercase px-6 py-2.5 rounded-full transition hover:bg-white/20 hover:border-white/50"
-            >
-              {dict.hero.enquireNow}
-            </button>
-          </div>
-            </motion.div>
-          </AnimatePresence>
+                <p className="text-sm md:text-base font-light opacity-90 leading-relaxed max-w-lg">
+                  {HERO_CONTENT[currentImageIndex].description}
+                </p>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={openModal}
+                    className="hidden sm:inline-flex items-center gap-2 border border-white/30 bg-white/10 backdrop-blur-sm text-white text-[10px] font-semibold tracking-wider uppercase px-6 py-2.5 rounded-full transition hover:bg-white/20 hover:border-white/50"
+                  >
+                    {dict.hero.enquireNow}
+                  </button>
+                </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
 
@@ -267,15 +263,17 @@ export function HomeView({
               <button
                 key={index}
                 type="button"
-                aria-current={isActive ? 'true' : undefined}
+                aria-current={isActive ? "true" : undefined}
                 aria-label={HERO_CONTENT[index].tagline}
                 onClick={() => setCurrentImageIndex(index)}
-                className={`touch-manipulation flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center gap-3 px-2 py-1 [-webkit-tap-highlight-color:transparent] transition-all duration-500 sm:gap-4 md:min-h-0 md:min-w-0 md:justify-start md:p-0 group cursor-pointer ${isActive ? 'opacity-100' : 'opacity-40 hover:opacity-80'}`}
+                className={`touch-manipulation flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center gap-3 px-2 py-1 [-webkit-tap-highlight-color:transparent] transition-all duration-500 sm:gap-4 md:min-h-0 md:min-w-0 md:justify-start md:p-0 group cursor-pointer ${isActive ? "opacity-100" : "opacity-40 hover:opacity-80"}`}
               >
                 <div
-                  className={`hidden h-[2px] bg-white transition-all duration-500 md:block ${isActive ? 'w-10 sm:w-12' : 'w-0 group-hover:w-6 sm:group-hover:w-8'}`}
+                  className={`hidden h-[2px] bg-white transition-all duration-500 md:block ${isActive ? "w-10 sm:w-12" : "w-0 group-hover:w-6 sm:group-hover:w-8"}`}
                 />
-                <span className={`leading-none transition-all duration-300 ${isActive ? 'text-gold' : ''}`}>
+                <span
+                  className={`leading-none transition-all duration-300 ${isActive ? "text-gold" : ""}`}
+                >
                   0{index + 1}
                 </span>
               </button>
@@ -285,8 +283,14 @@ export function HomeView({
 
         {/* Scroll indicator */}
         <div className="absolute z-10 bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/60">
-          <span className="text-[10px] uppercase tracking-[0.3em] font-light">{dict.hero.scroll}</span>
-          <ChevronDown className="h-4 w-4" style={{ animation: 'bounce-slow 2s infinite' }} strokeWidth={1.5} />
+          <span className="text-[10px] uppercase tracking-[0.3em] font-light">
+            {dict.hero.scroll}
+          </span>
+          <ChevronDown
+            className="h-4 w-4"
+            style={{ animation: "bounce-slow 2s infinite" }}
+            strokeWidth={1.5}
+          />
         </div>
       </section>
 
@@ -302,8 +306,8 @@ export function HomeView({
         {/* Left Side: Staggered Images */}
         <div className="relative h-[600px] sm:h-[800px] w-full">
           <div className="absolute -top-6 -left-6 w-24 h-24 border-t-2 border-l-2 border-gold/30 rounded-tl-3xl pointer-events-none" />
-          
-          <motion.div 
+
+          <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
@@ -321,7 +325,7 @@ export function HomeView({
             <div className="absolute inset-0 bg-gradient-to-br from-navy/20 via-transparent to-gold/10" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
           </motion.div>
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
@@ -344,30 +348,72 @@ export function HomeView({
         </div>
 
         {/* Right Side: Text Content */}
-        <motion.div 
+        <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
           variants={{
             hidden: { opacity: 0 },
-            visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
+            visible: { opacity: 1, transition: { staggerChildren: 0.15 } },
           }}
           className="flex flex-col max-w-xl"
         >
-          <motion.div variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }} className="flex items-center gap-4 mb-6">
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, y: 30 },
+              visible: {
+                opacity: 1,
+                y: 0,
+                transition: { duration: 0.8, ease: "easeOut" },
+              },
+            }}
+            className="flex items-center gap-4 mb-6"
+          >
             <div className="h-[2px] w-12 bg-gold" />
-            <h3 className="uppercase tracking-[0.2em] font-bold text-xs text-gold-dark">{dict.howWeWork.label}</h3>
+            <h3 className="uppercase tracking-[0.2em] font-bold text-xs text-gold-dark">
+              {dict.howWeWork.label}
+            </h3>
           </motion.div>
-          
-          <motion.h2 variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }} className="text-4xl md:text-5xl font-serif font-normal leading-tight text-slate-900 mb-8">
+
+          <motion.h2
+            variants={{
+              hidden: { opacity: 0, y: 30 },
+              visible: {
+                opacity: 1,
+                y: 0,
+                transition: { duration: 0.8, ease: "easeOut" },
+              },
+            }}
+            className="text-4xl md:text-5xl font-serif font-normal leading-tight text-slate-900 mb-8"
+          >
             {dict.howWeWork.title}
           </motion.h2>
-          
-          <motion.div variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }} className="text-slate-600 font-normal text-lg leading-relaxed mb-6">
+
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, y: 30 },
+              visible: {
+                opacity: 1,
+                y: 0,
+                transition: { duration: 0.8, ease: "easeOut" },
+              },
+            }}
+            className="text-slate-600 font-normal text-lg leading-relaxed mb-6"
+          >
             {dict.howWeWork.description}
           </motion.div>
-          
-          <motion.div variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }} className="text-slate-500 font-light leading-relaxed border-l-2 border-gold/30 pl-5">
+
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, y: 30 },
+              visible: {
+                opacity: 1,
+                y: 0,
+                transition: { duration: 0.8, ease: "easeOut" },
+              },
+            }}
+            className="text-slate-500 font-light leading-relaxed border-l-2 border-gold/30 pl-5"
+          >
             {dict.howWeWork.tiers}
           </motion.div>
         </motion.div>
@@ -375,21 +421,12 @@ export function HomeView({
 
       <EnquireModal
         open={isModalOpen}
-        view={modalView}
         leadThankYou={leadThankYou}
         leadSubmitting={leadSubmitting}
         leadError={leadError}
         modal={dict.modal}
         onClose={closeEnquireModal}
         onLeadSubmit={handleLeadSubmit}
-        onSelectGold={() => {
-          closeEnquireModal();
-          window.location.href = '/pricing/gold';
-        }}
-        onSelectPlatinum={() => {
-          closeEnquireModal();
-          window.location.href = '/pricing/platinum';
-        }}
       />
     </main>
   );
