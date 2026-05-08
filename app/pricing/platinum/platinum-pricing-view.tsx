@@ -11,10 +11,13 @@ import {
   ShieldCheck,
   Sparkles,
   TreePine,
-  ArrowRight,
   Gem,
   MapPin,
   Ruler,
+  DoorOpen,
+  Sofa,
+  CookingPot,
+  Bath,
 } from "lucide-react";
 
 import heroPlatinum from "../../../photos/hero-1.jpg";
@@ -162,61 +165,73 @@ export function PlatinumPricingView() {
             imageClassName="aspect-[3/2]"
             title={
               <div className="space-y-1">
-                <span className="block text-[9px] font-semibold uppercase tracking-[0.22em] text-platinum-dark">
-                  Residence Type
-                </span>
-                <span className="block text-lg font-semibold uppercase tracking-[0.14em] text-navy">
+                <div className="flex items-center gap-2.5 mb-1.5">
+                  <div className="h-[3px] w-5 rounded-full bg-gold" />
+                  <span className="block text-[10px] font-semibold uppercase tracking-[0.24em] text-platinum-dark">
+                    Residence Type
+                  </span>
+                </div>
+                <span className="block text-lg font-semibold uppercase tracking-[0.12em] text-navy">
                   {dict.pricing.tier3Bed}
                 </span>
               </div>
             }
           >
             {/* Price */}
-            <div className="mt-5 grid grid-cols-2 gap-5">
-              <div className="space-y-1">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-platinum-dark">
-                  {dict.pricing.Kes}
-                </p>
-                <p className="font-serif text-[1.35rem] leading-none tracking-tight text-navy">
+            <div className="mt-5 grid grid-cols-2 gap-0 rounded-xl border border-platinum-light/70 overflow-hidden">
+              <div className="relative border-r border-platinum-light/70 px-[18px] py-[14px]">
+                <div className="flex items-center gap-1.5">
+                  <span className="inline-flex items-center justify-center rounded-[4px] bg-navy px-[7px] py-px text-[9px] font-bold leading-[1.5] tracking-[0.08em] text-white">
+                    {dict.pricing.Kes}
+                  </span>
+                </div>
+                <p className="font-serif text-[1.5rem] leading-none tracking-tight text-navy mt-1.5">
                   <AnimatedPrice value="13.9M" />
                 </p>
-                <p className="text-[11px] font-light text-slate-400">
+                <p className="text-[11px] font-light text-slate-400 mt-0.5">
                   {dict.pricing.from}
                 </p>
               </div>
-              <div className="space-y-1">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-platinum-dark">
-                  {dict.pricing.Usd}
-                </p>
-                <p className="font-serif text-[1.35rem] leading-none tracking-tight text-navy">
+              <div className="px-[18px] py-[14px]">
+                <div className="flex items-center gap-1.5">
+                  <span className="inline-flex items-center justify-center rounded-[4px] bg-navy px-[7px] py-px text-[9px] font-bold leading-[1.5] tracking-[0.08em] text-white">
+                    {dict.pricing.Usd}
+                  </span>
+                </div>
+                <p className="font-serif text-[1.5rem] leading-none tracking-tight text-navy mt-1.5">
                   <AnimatedPrice value="107,750" />
                 </p>
-                <p className="text-[11px] font-light text-slate-400">
+                <p className="text-[11px] font-light text-slate-400 mt-0.5">
                   {dict.pricing.from}
                 </p>
               </div>
             </div>
 
+            {/* Divider */}
+            <div className="relative mt-5">
+              <div className="h-px bg-gradient-to-r from-platinum-light via-platinum-light to-transparent" />
+              <div className="absolute -top-[3px] left-0 h-[6px] w-[28px] rounded-full bg-gold/40" />
+            </div>
+
             {/* Features */}
-            <div className="mt-6 border-t border-platinum-light pt-5">
-              <h3 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-platinum-dark">
+            <div className="mt-4">
+              <h3 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-navy">
                 {dict.pricing.descriptionHeading}
               </h3>
-              <ul className="mt-4 space-y-2.5">
+              <ul className="mt-[14px] space-y-[10px]">
                 {[
-                  { icon: Building2, label: "3 separate bedrooms" },
-                  { icon: Building2, label: "Living room / lounge area" },
-                  { icon: Building2, label: "Kitchen (open or separate)" },
-                  { icon: Building2, label: "One or more bathrooms" },
+                  { icon: DoorOpen, label: "3 separate bedrooms" },
+                  { icon: Sofa, label: "Living room / lounge area" },
+                  { icon: CookingPot, label: "Kitchen (open or separate)" },
+                  { icon: Bath, label: "One or more bathrooms" },
                 ].map(({ icon: Icon, label }) => (
                   <li
                     key={label}
-                    className="flex items-start gap-3 text-sm font-light leading-relaxed text-slate-600"
+                    className="flex items-start gap-[14px] text-sm font-normal leading-relaxed text-slate-700"
                   >
-                    <Icon
-                      className="mt-0.5 h-3.5 w-3.5 shrink-0 text-navy/40"
-                      strokeWidth={1.5}
-                    />
+                    <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-navy/[0.07] text-navy">
+                      <Icon className="h-3.5 w-3.5" strokeWidth={1.5} />
+                    </span>
                     {label}
                   </li>
                 ))}
@@ -233,47 +248,60 @@ export function PlatinumPricingView() {
             imageClassName="aspect-[3/2]"
             title={
               <div className="space-y-1">
-                <span className="block text-[9px] font-semibold uppercase tracking-[0.22em] text-platinum-dark">
-                  Residence Type
-                </span>
-                <span className="block text-lg font-semibold uppercase tracking-[0.14em] text-navy">
+                <div className="flex items-center gap-2.5 mb-1.5">
+                  <div className="h-[3px] w-5 rounded-full bg-gold" />
+                  <span className="block text-[10px] font-semibold uppercase tracking-[0.24em] text-platinum-dark">
+                    Residence Type
+                  </span>
+                </div>
+                <span className="block text-lg font-semibold uppercase tracking-[0.12em] text-navy">
                   {dict.pricing.tierTownhouse}
                 </span>
               </div>
             }
           >
             {/* Price */}
-            <div className="mt-5 grid grid-cols-2 gap-5">
-              <div className="space-y-1">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-platinum-dark">
-                  {dict.pricing.Kes}
-                </p>
-                <p className="font-serif text-[1.35rem] leading-none tracking-tight text-navy">
+            <div className="mt-5 grid grid-cols-2 gap-0 rounded-xl border border-platinum-light/70 overflow-hidden">
+              <div className="relative border-r border-platinum-light/70 px-[18px] py-[14px]">
+                <div className="flex items-center gap-1.5">
+                  <span className="inline-flex items-center justify-center rounded-[4px] bg-navy px-[7px] py-px text-[9px] font-bold leading-[1.5] tracking-[0.08em] text-white">
+                    {dict.pricing.Kes}
+                  </span>
+                </div>
+                <p className="font-serif text-[1.5rem] leading-none tracking-tight text-navy mt-1.5">
                   <AnimatedPrice value="23M" />
                 </p>
-                <p className="text-[11px] font-light text-slate-400">
+                <p className="text-[11px] font-light text-slate-400 mt-0.5">
                   {dict.pricing.from}
                 </p>
               </div>
-              <div className="space-y-1">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-platinum-dark">
-                  {dict.pricing.Usd}
-                </p>
-                <p className="font-serif text-[1.35rem] leading-none tracking-tight text-navy">
+              <div className="px-[18px] py-[14px]">
+                <div className="flex items-center gap-1.5">
+                  <span className="inline-flex items-center justify-center rounded-[4px] bg-navy px-[7px] py-px text-[9px] font-bold leading-[1.5] tracking-[0.08em] text-white">
+                    {dict.pricing.Usd}
+                  </span>
+                </div>
+                <p className="font-serif text-[1.5rem] leading-none tracking-tight text-navy mt-1.5">
                   <AnimatedPrice value="178,300" />
                 </p>
-                <p className="text-[11px] font-light text-slate-400">
+                <p className="text-[11px] font-light text-slate-400 mt-0.5">
                   {dict.pricing.from}
                 </p>
               </div>
             </div>
 
+            {/* Divider */}
+            <div className="relative mt-5">
+              <div className="h-px bg-gradient-to-r from-platinum-light via-platinum-light to-transparent" />
+              <div className="absolute -top-[3px] left-0 h-[6px] w-[28px] rounded-full bg-gold/40" />
+            </div>
+
             {/* Features */}
-            <div className="mt-6 border-t border-platinum-light pt-5">
-              <h3 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-platinum-dark">
+            <div className="mt-4">
+              <h3 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-navy">
                 {dict.pricing.descriptionHeading}
               </h3>
-              <ul className="mt-4 space-y-2.5">
+              <ul className="mt-[14px] space-y-[10px]">
                 {[
                   { icon: Ruler, label: "Multi-level homes" },
                   { icon: Building2, label: "From 3 bedrooms" },
@@ -305,12 +333,11 @@ export function PlatinumPricingView() {
                 ].map(({ icon: Icon, label }) => (
                   <li
                     key={label}
-                    className="flex items-start gap-3 text-sm font-light leading-relaxed text-slate-600"
+                    className="flex items-start gap-[14px] text-sm font-normal leading-relaxed text-slate-700"
                   >
-                    <Icon
-                      className="mt-0.5 h-3.5 w-3.5 shrink-0 text-navy/40"
-                      strokeWidth={1.5}
-                    />
+                    <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-navy/[0.07] text-navy">
+                      <Icon className="h-3.5 w-3.5" strokeWidth={1.5} />
+                    </span>
                     {label}
                   </li>
                 ))}
@@ -334,26 +361,6 @@ export function PlatinumPricingView() {
         </p>
       </MotionDiv>
 
-      {/* ── CTA ── */}
-      <MotionDiv
-        initial={{ opacity: 0, y: 30 }}
-        transition={{ delay: 0.75 }}
-        className="mt-10 text-center"
-      >
-        <a
-          href="/?enquire=platinum"
-          className="group inline-flex items-center gap-3 rounded-full border border-navy/15 bg-navy px-7 py-3.5 text-[12px] font-semibold uppercase tracking-[0.18em] text-white shadow-[0_18px_45px_-18px_rgba(31,45,61,0.45)] transition-all duration-500 hover:scale-[1.02] hover:bg-navy-light hover:shadow-[0_24px_55px_-18px_rgba(31,45,61,0.55)] active:scale-[0.98]"
-        >
-          {dict.hero.enquireNow}
-          <ArrowRight
-            className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1"
-            strokeWidth={1.5}
-          />
-        </a>
-        <p className="mt-5 text-[12px] font-light tracking-wide text-slate-400">
-          Our investment advisors will reach out within 24 hours.
-        </p>
-      </MotionDiv>
     </PricingPageLayout>
   );
 }

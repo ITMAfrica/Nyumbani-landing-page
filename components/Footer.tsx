@@ -71,7 +71,7 @@ export function SiteFooter() {
                 <br />
                 Kilimani, Nairobi, Kenya
               </p>
-              <div className="mt-5 flex flex-col gap-2 text-sm font-medium text-white/80">
+              <div className="mt-5 flex flex-col gap-2 text-sm font-light leading-relaxed text-white/60">
                 <a
                   href="mailto:client@nyumbani-africa.com"
                   className="transition hover:text-gold"

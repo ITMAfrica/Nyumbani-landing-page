@@ -380,27 +380,30 @@ export function HomeView({
       <section
         id="how-we-work"
         ref={howWeWorkRef}
-        className="relative py-28 px-8 md:px-16 lg:px-32 max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-24 items-center bg-white overflow-hidden"
+        className="relative py-24 md:py-32 px-8 md:px-16 lg:px-32 max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 lg:gap-24 items-center bg-white overflow-hidden"
       >
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gold/[0.03] rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-navy/[0.03] rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+        {/* Ambient background blurs */}
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gold/[0.025] rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[450px] h-[450px] bg-navy/[0.025] rounded-full blur-3xl translate-y-1/3 -translate-x-1/3 pointer-events-none" />
 
-        {/* Left Side: Staggered Images */}
-        <div className="relative h-[600px] sm:h-[800px] w-full">
-          <div className="absolute -top-6 -left-6 w-24 h-24 border-t-2 border-l-2 border-gold/30 rounded-tl-3xl pointer-events-none" />
+        {/* Left Side: Refined Staggered Images */}
+        <div className="relative h-[550px] sm:h-[750px] md:h-[700px] w-full">
+          {/* Top-left corner accent */}
+          <div className="absolute -top-5 -left-5 w-20 h-20 border-t-2 border-l-2 border-gold/25 rounded-tl-3xl pointer-events-none z-30" />
 
+          {/* Top image — slightly larger, more deliberate positioning */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
+            initial={{ opacity: 0, x: -60 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 0.9, ease: "easeOut" }}
             style={{ y: parallaxY1 }}
-            className="absolute top-0 left-0 w-3/4 h-[50%] z-10 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-black/5"
+            className="absolute top-[4%] left-0 w-[72%] h-[52%] z-10 rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.1)] ring-1 ring-black/5"
           >
             <AnimatePresence mode="popLayout">
               <motion.div
                 key={topSlideIndex}
-                initial={{ opacity: 0, scale: 1.05 }}
+                initial={{ opacity: 0, scale: 1.04 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 1, ease: "easeInOut" }}
@@ -415,8 +418,8 @@ export function HomeView({
                 />
               </motion.div>
             </AnimatePresence>
-            <div className="absolute inset-0 bg-gradient-to-br from-navy/20 via-transparent to-gold/10" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-br from-navy/15 via-transparent to-gold/8" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
             {/* Slide indicators */}
             <div
               className="absolute bottom-3 right-3 z-[4] flex gap-1.5"
@@ -425,25 +428,32 @@ export function HomeView({
               {SECTION_TOP_IMAGES.map((_, i) => (
                 <span
                   key={i}
-                  className={`h-1.5 w-1.5 rounded-full transition-colors duration-500 ${
-                    i === topSlideIndex ? "bg-white" : "bg-white/40"
+                  className={`h-1.5 w-1.5 rounded-full transition-all duration-500 ${
+                    i === topSlideIndex
+                      ? "bg-white scale-110"
+                      : "bg-white/40 hover:bg-white/60"
                   }`}
                 />
               ))}
             </div>
           </motion.div>
+
+          {/* Decorative middle element — a subtle gold line connecting the two images */}
+          <div className="absolute top-[58%] left-[15%] w-[55%] h-[1px] bg-gradient-to-r from-transparent via-gold/20 to-transparent z-15 pointer-events-none" />
+
+          {/* Bottom image — slightly refined shadow and positioning */}
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 60 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            transition={{ duration: 0.9, delay: 0.15, ease: "easeOut" }}
             style={{ y: parallaxY2 }}
-            className="absolute bottom-0 right-0 w-[65%] h-[60%] z-20 rounded-2xl overflow-hidden shadow-[-10px_10px_40px_rgba(0,0,0,0.12)] ring-1 ring-black/5"
+            className="absolute bottom-[3%] right-0 w-[68%] h-[55%] z-20 rounded-2xl overflow-hidden shadow-[-8px_16px_48px_rgba(0,0,0,0.12)] ring-1 ring-black/5"
           >
             <AnimatePresence mode="popLayout">
               <motion.div
                 key={bottomSlideIndex}
-                initial={{ opacity: 0, scale: 1.05 }}
+                initial={{ opacity: 0, scale: 1.04 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 1, ease: "easeInOut" }}
@@ -454,12 +464,12 @@ export function HomeView({
                   alt={`Villa au crépuscule — ${bottomSlideIndex + 1}`}
                   fill
                   className="object-cover"
-                  sizes="(max-width: 768px) 65vw, 400px"
+                  sizes="(max-width: 768px) 65vw, 420px"
                 />
               </motion.div>
             </AnimatePresence>
-            <div className="absolute inset-0 bg-gradient-to-bl from-gold/15 via-transparent to-navy/15" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-bl from-gold/12 via-transparent to-navy/12" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
             {/* Slide indicators */}
             <div
               className="absolute bottom-3 right-3 z-[4] flex gap-1.5"
@@ -468,18 +478,21 @@ export function HomeView({
               {SECTION_BOTTOM_IMAGES.map((_, i) => (
                 <span
                   key={i}
-                  className={`h-1.5 w-1.5 rounded-full transition-colors duration-500 ${
-                    i === bottomSlideIndex ? "bg-white" : "bg-white/40"
+                  className={`h-1.5 w-1.5 rounded-full transition-all duration-500 ${
+                    i === bottomSlideIndex
+                      ? "bg-white scale-110"
+                      : "bg-white/40 hover:bg-white/60"
                   }`}
                 />
               ))}
             </div>
           </motion.div>
 
-          <div className="absolute -bottom-4 -right-4 w-32 h-32 border-b-2 border-r-2 border-gold/30 rounded-br-3xl pointer-events-none" />
+          {/* Bottom-right corner accent */}
+          <div className="absolute -bottom-4 -right-4 w-28 h-28 border-b-2 border-r-2 border-gold/25 rounded-br-3xl pointer-events-none z-30" />
         </div>
 
-        {/* Right Side: Text Content */}
+        {/* Right Side: Refined Text Content */}
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -488,8 +501,9 @@ export function HomeView({
             hidden: { opacity: 0 },
             visible: { opacity: 1, transition: { staggerChildren: 0.15 } },
           }}
-          className="flex flex-col max-w-xl"
+          className="flex flex-col max-w-[480px]"
         >
+          {/* Label */}
           <motion.div
             variants={{
               hidden: { opacity: 0, y: 30 },
@@ -507,6 +521,7 @@ export function HomeView({
             </h3>
           </motion.div>
 
+          {/* Title */}
           <motion.h2
             variants={{
               hidden: { opacity: 0, y: 30 },
@@ -516,11 +531,47 @@ export function HomeView({
                 transition: { duration: 0.8, ease: "easeOut" },
               },
             }}
-            className="text-4xl md:text-5xl font-serif font-normal leading-tight text-slate-900 mb-8"
+            className="text-4xl md:text-5xl font-serif font-normal leading-[1.15] text-slate-900 mb-6"
           >
             {dict.howWeWork.title}
           </motion.h2>
 
+          {/* Value pills — visual anchors between title and description */}
+          <motion.div
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: { staggerChildren: 0.1, delayChildren: 0.1 },
+              },
+            }}
+            className="flex flex-wrap gap-2.5 mb-7"
+          >
+            {dict.howWeWork.pills.map((pill, i) => (
+              <motion.span
+                key={pill}
+                variants={{
+                  hidden: { opacity: 0, y: 12 },
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                    transition: { duration: 0.6, ease: "easeOut" },
+                  },
+                }}
+                className={`inline-block text-[11px] font-semibold uppercase tracking-[0.15em] px-3.5 py-1.5 rounded-full border ${
+                  i === 0
+                    ? "bg-gold/[0.07] border-gold/25 text-gold-dark"
+                    : i === 1
+                      ? "bg-navy/[0.05] border-navy-light/20 text-navy-light"
+                      : "bg-platinum/30 border-platinum-dark/25 text-slate-700"
+                }`}
+              >
+                {pill}
+              </motion.span>
+            ))}
+          </motion.div>
+
+          {/* Description */}
           <motion.div
             variants={{
               hidden: { opacity: 0, y: 30 },
@@ -530,11 +581,24 @@ export function HomeView({
                 transition: { duration: 0.8, ease: "easeOut" },
               },
             }}
-            className="text-slate-600 font-normal text-lg leading-relaxed mb-6"
+            className="text-slate-600 font-normal text-base/relaxed md:text-lg/relaxed mb-6"
           >
             {dict.howWeWork.description}
           </motion.div>
 
+          {/* Divider */}
+          <motion.div
+            variants={{
+              hidden: { scaleX: 0 },
+              visible: {
+                scaleX: 1,
+                transition: { duration: 0.8, ease: "easeOut" },
+              },
+            }}
+            className="w-16 h-[1px] bg-gold/30 mb-6 origin-left"
+          />
+
+          {/* Tiers info */}
           <motion.div
             variants={{
               hidden: { opacity: 0, y: 30 },
@@ -544,9 +608,31 @@ export function HomeView({
                 transition: { duration: 0.8, ease: "easeOut" },
               },
             }}
-            className="text-slate-500 font-light leading-relaxed border-l-2 border-gold/30 pl-5"
+            className="text-slate-500 font-light text-sm/relaxed md:text-base/relaxed border-l-2 border-gold/20 pl-5 mb-7"
           >
             {dict.howWeWork.tiers}
+          </motion.div>
+
+          {/* CTA Link */}
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              visible: {
+                opacity: 1,
+                y: 0,
+                transition: { duration: 0.7, ease: "easeOut" },
+              },
+            }}
+          >
+            <Link
+              href="/pricing/platinum"
+              className="group inline-flex items-center gap-2 text-sm font-semibold text-navy hover:text-gold-dark transition-colors duration-300"
+            >
+              <span className="border-b border-navy/20 group-hover:border-gold/40 transition-colors duration-300 pb-0.5">
+                {dict.howWeWork.cta}
+              </span>
+              <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </Link>
           </motion.div>
         </motion.div>
       </section>
