@@ -3,8 +3,6 @@ type MailPayload = {
   email: string;
   source: "lead" | "newsletter";
   phone?: string;
-  plan?: string;
-  reason?: string;
   tier?: string;
 };
 

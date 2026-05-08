@@ -5,8 +5,6 @@ type LeadBody = {
   name?: string;
   email?: string;
   phone?: string;
-  plan?: string;
-  reason?: string;
   tier?: string;
 };
 
@@ -38,8 +36,6 @@ export async function POST(request: Request) {
       name,
       email,
       phone: body.phone?.trim(),
-      plan: body.plan,
-      reason: body.reason,
       tier: body.tier,
     });
 

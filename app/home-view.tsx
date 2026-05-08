@@ -1,24 +1,51 @@
 "use client";
 
-import {
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-  type FormEvent,
-} from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence, useScroll, useTransform } from "motion/react";
 import { useI18n } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/dictionaries";
+import type { LeadFormValues } from "@/lib/validations";
 import { EnquireModal } from "@/components/enquire-modal";
+import {
+  ContactCaptureModal,
+  type ContactCaptureValues,
+} from "@/components/contact-capture-modal";
 
 import heroPlatinum from "../photos/hero-1.jpg";
 import heroGold from "../photos/hero-2.jpg";
-import sectionVillaTop from "../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_5001.webp";
-import sectionVillaBottom from "../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4450.webp";
+import sectionVillaTop1 from "../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_4968.webp";
+import sectionVillaTop2 from "../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_4974.webp";
+import sectionVillaTop3 from "../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_4985.webp";
+import sectionVillaTop4 from "../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_4995.webp";
+import sectionVillaTop5 from "../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_5001.webp";
+import sectionVillaTop6 from "../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_5006.webp";
+import sectionVillaBottom1 from "../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4434.webp";
+import sectionVillaBottom2 from "../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4442.webp";
+import sectionVillaBottom3 from "../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4450.webp";
+import sectionVillaBottom4 from "../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4455.webp";
+import sectionVillaBottom5 from "../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4464.webp";
+import sectionVillaBottom6 from "../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4469.webp";
+
+const SECTION_TOP_IMAGES = [
+  sectionVillaTop1,
+  sectionVillaTop2,
+  sectionVillaTop3,
+  sectionVillaTop4,
+  sectionVillaTop5,
+  sectionVillaTop6,
+];
+
+const SECTION_BOTTOM_IMAGES = [
+  sectionVillaBottom1,
+  sectionVillaBottom2,
+  sectionVillaBottom3,
+  sectionVillaBottom4,
+  sectionVillaBottom5,
+  sectionVillaBottom6,
+];
 
 const HERO_LOGO_URL =
   "https://auzyjcdanenhoqyrbjxg.supabase.co/storage/v1/object/public/images/users/7a23a808-8309-4bff-b922-1a9db7482400/e38b6f4a-4227-48e6-8f6d-b3acea7daa8c.png";
@@ -58,10 +85,16 @@ export function HomeView({
   const { dict } = useI18n();
   const HERO_CONTENT = getHeroContent(dict);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [topSlideIndex, setTopSlideIndex] = useState(0);
+  const [bottomSlideIndex, setBottomSlideIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [leadThankYou, setLeadThankYou] = useState(false);
   const [leadSubmitting, setLeadSubmitting] = useState(false);
   const [leadError, setLeadError] = useState<string | null>(null);
+  const [isCaptureOpen, setIsCaptureOpen] = useState(false);
+  const [captureThankYou, setCaptureThankYou] = useState(false);
+  const [captureSubmitting, setCaptureSubmitting] = useState(false);
+  const [captureError, setCaptureError] = useState<string | null>(null);
 
   const howWeWorkRef = useRef<HTMLElement>(null);
 
@@ -93,50 +126,99 @@ export function HomeView({
     setLeadError(null);
   }, []);
 
+  const openCaptureModal = useCallback(() => {
+    setCaptureThankYou(false);
+    setCaptureError(null);
+    setIsCaptureOpen(true);
+  }, []);
+
+  const closeCaptureModal = useCallback(() => {
+    setIsCaptureOpen(false);
+    setCaptureThankYou(false);
+    setCaptureError(null);
+  }, []);
+
+  const handleCaptureSubmit = useCallback(
+    async (data: ContactCaptureValues) => {
+      setCaptureSubmitting(true);
+      setCaptureError(null);
+
+      // Mark intro as done immediately so the modal never reappears
+      persistIntroDone();
+
+      // Fire-and-forget: send data to backend without blocking the redirect.
+      // keepalive: true ensures the request completes even after navigation.
+      fetch("/api/mail/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        keepalive: true,
+      }).catch(() => {
+        // Silently ignore – the user has already moved on.
+      });
+
+      // Redirect immediately to the destination page while the backend updates.
+      window.location.href = "/pricing/platinum";
+    },
+    [persistIntroDone],
+  );
+
   const handleLeadSubmit = useCallback(
-    async (e: FormEvent<HTMLFormElement>, tier: "gold" | "platinum") => {
-      e.preventDefault();
-      const form = e.currentTarget;
-      const rawName = (
-        form.elements.namedItem("lead-name") as HTMLInputElement | null
-      )?.value?.trim();
-      const rawEmail = (
-        form.elements.namedItem("lead-email") as HTMLInputElement | null
-      )?.value?.trim();
-      const rawPhone = (
-        form.elements.namedItem("lead-phone") as HTMLInputElement | null
-      )?.value?.trim();
-      const rawPlan = (
-        form.elements.namedItem("lead-plan") as HTMLSelectElement | null
-      )?.value;
-      const rawReason = (
-        form.elements.namedItem("lead-reason") as HTMLSelectElement | null
-      )?.value;
-      if (!rawName || !rawEmail) return;
+    async (data: LeadFormValues) => {
       setLeadSubmitting(true);
       setLeadError(null);
 
-      // TODO: replace with API call once backend is ready
-      persistIntroDone();
-      setLeadThankYou(true);
-      window.setTimeout(() => {
-        setLeadThankYou(false);
-        setIsModalOpen(false);
-        if (tier === "gold") {
-          window.location.href = "/pricing/gold";
-        } else if (tier === "platinum") {
-          window.location.href = "/pricing/platinum";
+      try {
+        const response = await fetch("/api/mail/lead", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          throw new Error("lead_submit_failed");
         }
-      }, 1500);
-      setLeadSubmitting(false);
+
+        persistIntroDone();
+        setLeadThankYou(true);
+
+        window.setTimeout(() => {
+          setLeadThankYou(false);
+          setIsModalOpen(false);
+          if (data.tier === "gold") {
+            window.location.href = "/pricing/gold";
+          } else if (data.tier === "platinum") {
+            window.location.href = "/pricing/platinum";
+          }
+        }, 1500);
+      } catch {
+        setLeadError(dict.modal.sendFailed);
+      } finally {
+        setLeadSubmitting(false);
+      }
     },
-    [persistIntroDone],
+    [persistIntroDone, dict.modal.sendFailed],
   );
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % HERO_CONTENT.length);
     }, 6000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Slideshow timers for How We Work section cards
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTopSlideIndex((prev) => (prev + 1) % SECTION_TOP_IMAGES.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setBottomSlideIndex((prev) => (prev + 1) % SECTION_BOTTOM_IMAGES.length);
+    }, 5500);
     return () => clearInterval(timer);
   }, []);
 
@@ -155,13 +237,13 @@ export function HomeView({
       )
         return;
       const timer = window.setTimeout(() => {
-        openModal();
+        openCaptureModal();
       }, 1500);
       return () => clearTimeout(timer);
     } catch {
       /* localStorage unavailable */
     }
-  }, [enquireParam, openModal]);
+  }, [enquireParam, openCaptureModal]);
 
   useEffect(() => {
     if (enquireParam !== "1") return;
@@ -298,56 +380,119 @@ export function HomeView({
       <section
         id="how-we-work"
         ref={howWeWorkRef}
-        className="relative py-28 px-8 md:px-16 lg:px-32 max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-24 items-center bg-white overflow-hidden"
+        className="relative py-24 md:py-32 px-8 md:px-16 lg:px-32 max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 lg:gap-24 items-center bg-white overflow-hidden"
       >
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gold/[0.03] rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-navy/[0.03] rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+        {/* Ambient background blurs */}
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gold/[0.025] rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[450px] h-[450px] bg-navy/[0.025] rounded-full blur-3xl translate-y-1/3 -translate-x-1/3 pointer-events-none" />
 
-        {/* Left Side: Staggered Images */}
-        <div className="relative h-[600px] sm:h-[800px] w-full">
-          <div className="absolute -top-6 -left-6 w-24 h-24 border-t-2 border-l-2 border-gold/30 rounded-tl-3xl pointer-events-none" />
+        {/* Left Side: Refined Staggered Images */}
+        <div className="relative h-[550px] sm:h-[750px] md:h-[700px] w-full">
+          {/* Top-left corner accent */}
+          <div className="absolute -top-5 -left-5 w-20 h-20 border-t-2 border-l-2 border-gold/25 rounded-tl-3xl pointer-events-none z-30" />
 
+          {/* Top image — slightly larger, more deliberate positioning */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
+            initial={{ opacity: 0, x: -60 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 0.9, ease: "easeOut" }}
             style={{ y: parallaxY1 }}
-            className="absolute top-0 left-0 w-3/4 h-[50%] z-10 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-black/5"
+            className="absolute top-[4%] left-0 w-[72%] h-[52%] z-10 rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.1)] ring-1 ring-black/5"
           >
-            <Image
-              src={sectionVillaTop}
-              alt="Modern white villa exterior"
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 75vw, 450px"
-            />
-            <div className="absolute inset-0 bg-gradient-to-br from-navy/20 via-transparent to-gold/10" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+            <AnimatePresence mode="popLayout">
+              <motion.div
+                key={topSlideIndex}
+                initial={{ opacity: 0, scale: 1.04 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1, ease: "easeInOut" }}
+                className="absolute inset-0"
+              >
+                <Image
+                  src={SECTION_TOP_IMAGES[topSlideIndex]}
+                  alt={`Villa moderne — ${topSlideIndex + 1}`}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 75vw, 450px"
+                />
+              </motion.div>
+            </AnimatePresence>
+            <div className="absolute inset-0 bg-gradient-to-br from-navy/15 via-transparent to-gold/8" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
+            {/* Slide indicators */}
+            <div
+              className="absolute bottom-3 right-3 z-[4] flex gap-1.5"
+              aria-hidden
+            >
+              {SECTION_TOP_IMAGES.map((_, i) => (
+                <span
+                  key={i}
+                  className={`h-1.5 w-1.5 rounded-full transition-all duration-500 ${
+                    i === topSlideIndex
+                      ? "bg-white scale-110"
+                      : "bg-white/40 hover:bg-white/60"
+                  }`}
+                />
+              ))}
+            </div>
           </motion.div>
+
+          {/* Decorative middle element — a subtle gold line connecting the two images */}
+          <div className="absolute top-[58%] left-[15%] w-[55%] h-[1px] bg-gradient-to-r from-transparent via-gold/20 to-transparent z-15 pointer-events-none" />
+
+          {/* Bottom image — slightly refined shadow and positioning */}
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 60 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            transition={{ duration: 0.9, delay: 0.15, ease: "easeOut" }}
             style={{ y: parallaxY2 }}
-            className="absolute bottom-0 right-0 w-[65%] h-[60%] z-20 rounded-2xl overflow-hidden shadow-[-10px_10px_40px_rgba(0,0,0,0.12)] ring-1 ring-black/5"
+            className="absolute bottom-[3%] right-0 w-[68%] h-[55%] z-20 rounded-2xl overflow-hidden shadow-[-8px_16px_48px_rgba(0,0,0,0.12)] ring-1 ring-black/5"
           >
-            <Image
-              src={sectionVillaBottom}
-              alt="Villa at dusk"
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 65vw, 400px"
-            />
-            <div className="absolute inset-0 bg-gradient-to-bl from-gold/15 via-transparent to-navy/15" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+            <AnimatePresence mode="popLayout">
+              <motion.div
+                key={bottomSlideIndex}
+                initial={{ opacity: 0, scale: 1.04 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1, ease: "easeInOut" }}
+                className="absolute inset-0"
+              >
+                <Image
+                  src={SECTION_BOTTOM_IMAGES[bottomSlideIndex]}
+                  alt={`Villa au crépuscule — ${bottomSlideIndex + 1}`}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 65vw, 420px"
+                />
+              </motion.div>
+            </AnimatePresence>
+            <div className="absolute inset-0 bg-gradient-to-bl from-gold/12 via-transparent to-navy/12" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+            {/* Slide indicators */}
+            <div
+              className="absolute bottom-3 right-3 z-[4] flex gap-1.5"
+              aria-hidden
+            >
+              {SECTION_BOTTOM_IMAGES.map((_, i) => (
+                <span
+                  key={i}
+                  className={`h-1.5 w-1.5 rounded-full transition-all duration-500 ${
+                    i === bottomSlideIndex
+                      ? "bg-white scale-110"
+                      : "bg-white/40 hover:bg-white/60"
+                  }`}
+                />
+              ))}
+            </div>
           </motion.div>
 
-          <div className="absolute -bottom-4 -right-4 w-32 h-32 border-b-2 border-r-2 border-gold/30 rounded-br-3xl pointer-events-none" />
+          {/* Bottom-right corner accent */}
+          <div className="absolute -bottom-4 -right-4 w-28 h-28 border-b-2 border-r-2 border-gold/25 rounded-br-3xl pointer-events-none z-30" />
         </div>
 
-        {/* Right Side: Text Content */}
+        {/* Right Side: Refined Text Content */}
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -356,8 +501,9 @@ export function HomeView({
             hidden: { opacity: 0 },
             visible: { opacity: 1, transition: { staggerChildren: 0.15 } },
           }}
-          className="flex flex-col max-w-xl"
+          className="flex flex-col max-w-[480px]"
         >
+          {/* Label */}
           <motion.div
             variants={{
               hidden: { opacity: 0, y: 30 },
@@ -375,6 +521,7 @@ export function HomeView({
             </h3>
           </motion.div>
 
+          {/* Title */}
           <motion.h2
             variants={{
               hidden: { opacity: 0, y: 30 },
@@ -384,11 +531,47 @@ export function HomeView({
                 transition: { duration: 0.8, ease: "easeOut" },
               },
             }}
-            className="text-4xl md:text-5xl font-serif font-normal leading-tight text-slate-900 mb-8"
+            className="text-4xl md:text-5xl font-serif font-normal leading-[1.15] text-slate-900 mb-6"
           >
             {dict.howWeWork.title}
           </motion.h2>
 
+          {/* Value pills — visual anchors between title and description */}
+          <motion.div
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: { staggerChildren: 0.1, delayChildren: 0.1 },
+              },
+            }}
+            className="flex flex-wrap gap-2.5 mb-7"
+          >
+            {dict.howWeWork.pills.map((pill, i) => (
+              <motion.span
+                key={pill}
+                variants={{
+                  hidden: { opacity: 0, y: 12 },
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                    transition: { duration: 0.6, ease: "easeOut" },
+                  },
+                }}
+                className={`inline-block text-[11px] font-semibold uppercase tracking-[0.15em] px-3.5 py-1.5 rounded-full border ${
+                  i === 0
+                    ? "bg-gold/[0.07] border-gold/25 text-gold-dark"
+                    : i === 1
+                      ? "bg-navy/[0.05] border-navy-light/20 text-navy-light"
+                      : "bg-platinum/30 border-platinum-dark/25 text-slate-700"
+                }`}
+              >
+                {pill}
+              </motion.span>
+            ))}
+          </motion.div>
+
+          {/* Description */}
           <motion.div
             variants={{
               hidden: { opacity: 0, y: 30 },
@@ -398,11 +581,24 @@ export function HomeView({
                 transition: { duration: 0.8, ease: "easeOut" },
               },
             }}
-            className="text-slate-600 font-normal text-lg leading-relaxed mb-6"
+            className="text-slate-600 font-normal text-base/relaxed md:text-lg/relaxed mb-6"
           >
             {dict.howWeWork.description}
           </motion.div>
 
+          {/* Divider */}
+          <motion.div
+            variants={{
+              hidden: { scaleX: 0 },
+              visible: {
+                scaleX: 1,
+                transition: { duration: 0.8, ease: "easeOut" },
+              },
+            }}
+            className="w-16 h-[1px] bg-gold/30 mb-6 origin-left"
+          />
+
+          {/* Tiers info */}
           <motion.div
             variants={{
               hidden: { opacity: 0, y: 30 },
@@ -412,12 +608,44 @@ export function HomeView({
                 transition: { duration: 0.8, ease: "easeOut" },
               },
             }}
-            className="text-slate-500 font-light leading-relaxed border-l-2 border-gold/30 pl-5"
+            className="text-slate-500 font-light text-sm/relaxed md:text-base/relaxed border-l-2 border-gold/20 pl-5 mb-7"
           >
             {dict.howWeWork.tiers}
           </motion.div>
+
+          {/* CTA Link */}
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              visible: {
+                opacity: 1,
+                y: 0,
+                transition: { duration: 0.7, ease: "easeOut" },
+              },
+            }}
+          >
+            <Link
+              href="/pricing/platinum"
+              className="group inline-flex items-center gap-2 text-sm font-semibold text-navy hover:text-gold-dark transition-colors duration-300"
+            >
+              <span className="border-b border-navy/20 group-hover:border-gold/40 transition-colors duration-300 pb-0.5">
+                {dict.howWeWork.cta}
+              </span>
+              <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </Link>
+          </motion.div>
         </motion.div>
       </section>
+
+      <ContactCaptureModal
+        open={isCaptureOpen}
+        thankYou={captureThankYou}
+        submitting={captureSubmitting}
+        error={captureError}
+        modal={dict.modal}
+        onCloseAction={closeCaptureModal}
+        onSubmitAction={handleCaptureSubmit}
+      />
 
       <EnquireModal
         open={isModalOpen}
@@ -425,8 +653,8 @@ export function HomeView({
         leadSubmitting={leadSubmitting}
         leadError={leadError}
         modal={dict.modal}
-        onClose={closeEnquireModal}
-        onLeadSubmit={handleLeadSubmit}
+        onCloseAction={closeEnquireModal}
+        onLeadSubmitAction={handleLeadSubmit}
       />
     </main>
   );
