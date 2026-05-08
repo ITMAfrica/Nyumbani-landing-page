@@ -1,24 +1,51 @@
 "use client";
 
-import {
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-  type FormEvent,
-} from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence, useScroll, useTransform } from "motion/react";
 import { useI18n } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/dictionaries";
+import type { LeadFormValues } from "@/lib/validations";
 import { EnquireModal } from "@/components/enquire-modal";
+import {
+  ContactCaptureModal,
+  type ContactCaptureValues,
+} from "@/components/contact-capture-modal";
 
 import heroPlatinum from "../photos/hero-1.jpg";
 import heroGold from "../photos/hero-2.jpg";
-import sectionVillaTop from "../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_5001.webp";
-import sectionVillaBottom from "../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4450.webp";
+import sectionVillaTop1 from "../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_4968.webp";
+import sectionVillaTop2 from "../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_4974.webp";
+import sectionVillaTop3 from "../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_4985.webp";
+import sectionVillaTop4 from "../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_4995.webp";
+import sectionVillaTop5 from "../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_5001.webp";
+import sectionVillaTop6 from "../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_5006.webp";
+import sectionVillaBottom1 from "../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4434.webp";
+import sectionVillaBottom2 from "../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4442.webp";
+import sectionVillaBottom3 from "../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4450.webp";
+import sectionVillaBottom4 from "../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4455.webp";
+import sectionVillaBottom5 from "../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4464.webp";
+import sectionVillaBottom6 from "../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4469.webp";
+
+const SECTION_TOP_IMAGES = [
+  sectionVillaTop1,
+  sectionVillaTop2,
+  sectionVillaTop3,
+  sectionVillaTop4,
+  sectionVillaTop5,
+  sectionVillaTop6,
+];
+
+const SECTION_BOTTOM_IMAGES = [
+  sectionVillaBottom1,
+  sectionVillaBottom2,
+  sectionVillaBottom3,
+  sectionVillaBottom4,
+  sectionVillaBottom5,
+  sectionVillaBottom6,
+];
 
 const HERO_LOGO_URL =
   "https://auzyjcdanenhoqyrbjxg.supabase.co/storage/v1/object/public/images/users/7a23a808-8309-4bff-b922-1a9db7482400/e38b6f4a-4227-48e6-8f6d-b3acea7daa8c.png";
@@ -58,10 +85,16 @@ export function HomeView({
   const { dict } = useI18n();
   const HERO_CONTENT = getHeroContent(dict);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [topSlideIndex, setTopSlideIndex] = useState(0);
+  const [bottomSlideIndex, setBottomSlideIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [leadThankYou, setLeadThankYou] = useState(false);
   const [leadSubmitting, setLeadSubmitting] = useState(false);
   const [leadError, setLeadError] = useState<string | null>(null);
+  const [isCaptureOpen, setIsCaptureOpen] = useState(false);
+  const [captureThankYou, setCaptureThankYou] = useState(false);
+  const [captureSubmitting, setCaptureSubmitting] = useState(false);
+  const [captureError, setCaptureError] = useState<string | null>(null);
 
   const howWeWorkRef = useRef<HTMLElement>(null);
 
@@ -93,50 +126,99 @@ export function HomeView({
     setLeadError(null);
   }, []);
 
+  const openCaptureModal = useCallback(() => {
+    setCaptureThankYou(false);
+    setCaptureError(null);
+    setIsCaptureOpen(true);
+  }, []);
+
+  const closeCaptureModal = useCallback(() => {
+    setIsCaptureOpen(false);
+    setCaptureThankYou(false);
+    setCaptureError(null);
+  }, []);
+
+  const handleCaptureSubmit = useCallback(
+    async (data: ContactCaptureValues) => {
+      setCaptureSubmitting(true);
+      setCaptureError(null);
+
+      // Mark intro as done immediately so the modal never reappears
+      persistIntroDone();
+
+      // Fire-and-forget: send data to backend without blocking the redirect.
+      // keepalive: true ensures the request completes even after navigation.
+      fetch("/api/mail/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        keepalive: true,
+      }).catch(() => {
+        // Silently ignore – the user has already moved on.
+      });
+
+      // Redirect immediately to the destination page while the backend updates.
+      window.location.href = "/pricing/platinum";
+    },
+    [persistIntroDone],
+  );
+
   const handleLeadSubmit = useCallback(
-    async (e: FormEvent<HTMLFormElement>, tier: "gold" | "platinum") => {
-      e.preventDefault();
-      const form = e.currentTarget;
-      const rawName = (
-        form.elements.namedItem("lead-name") as HTMLInputElement | null
-      )?.value?.trim();
-      const rawEmail = (
-        form.elements.namedItem("lead-email") as HTMLInputElement | null
-      )?.value?.trim();
-      const rawPhone = (
-        form.elements.namedItem("lead-phone") as HTMLInputElement | null
-      )?.value?.trim();
-      const rawPlan = (
-        form.elements.namedItem("lead-plan") as HTMLSelectElement | null
-      )?.value;
-      const rawReason = (
-        form.elements.namedItem("lead-reason") as HTMLSelectElement | null
-      )?.value;
-      if (!rawName || !rawEmail) return;
+    async (data: LeadFormValues) => {
       setLeadSubmitting(true);
       setLeadError(null);
 
-      // TODO: replace with API call once backend is ready
-      persistIntroDone();
-      setLeadThankYou(true);
-      window.setTimeout(() => {
-        setLeadThankYou(false);
-        setIsModalOpen(false);
-        if (tier === "gold") {
-          window.location.href = "/pricing/gold";
-        } else if (tier === "platinum") {
-          window.location.href = "/pricing/platinum";
+      try {
+        const response = await fetch("/api/mail/lead", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          throw new Error("lead_submit_failed");
         }
-      }, 1500);
-      setLeadSubmitting(false);
+
+        persistIntroDone();
+        setLeadThankYou(true);
+
+        window.setTimeout(() => {
+          setLeadThankYou(false);
+          setIsModalOpen(false);
+          if (data.tier === "gold") {
+            window.location.href = "/pricing/gold";
+          } else if (data.tier === "platinum") {
+            window.location.href = "/pricing/platinum";
+          }
+        }, 1500);
+      } catch {
+        setLeadError(dict.modal.sendFailed);
+      } finally {
+        setLeadSubmitting(false);
+      }
     },
-    [persistIntroDone],
+    [persistIntroDone, dict.modal.sendFailed],
   );
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % HERO_CONTENT.length);
     }, 6000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Slideshow timers for How We Work section cards
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTopSlideIndex((prev) => (prev + 1) % SECTION_TOP_IMAGES.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setBottomSlideIndex((prev) => (prev + 1) % SECTION_BOTTOM_IMAGES.length);
+    }, 5500);
     return () => clearInterval(timer);
   }, []);
 
@@ -155,13 +237,13 @@ export function HomeView({
       )
         return;
       const timer = window.setTimeout(() => {
-        openModal();
+        openCaptureModal();
       }, 1500);
       return () => clearTimeout(timer);
     } catch {
       /* localStorage unavailable */
     }
-  }, [enquireParam, openModal]);
+  }, [enquireParam, openCaptureModal]);
 
   useEffect(() => {
     if (enquireParam !== "1") return;
@@ -315,15 +397,40 @@ export function HomeView({
             style={{ y: parallaxY1 }}
             className="absolute top-0 left-0 w-3/4 h-[50%] z-10 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-black/5"
           >
-            <Image
-              src={sectionVillaTop}
-              alt="Modern white villa exterior"
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 75vw, 450px"
-            />
+            <AnimatePresence mode="popLayout">
+              <motion.div
+                key={topSlideIndex}
+                initial={{ opacity: 0, scale: 1.05 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1, ease: "easeInOut" }}
+                className="absolute inset-0"
+              >
+                <Image
+                  src={SECTION_TOP_IMAGES[topSlideIndex]}
+                  alt={`Villa moderne — ${topSlideIndex + 1}`}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 75vw, 450px"
+                />
+              </motion.div>
+            </AnimatePresence>
             <div className="absolute inset-0 bg-gradient-to-br from-navy/20 via-transparent to-gold/10" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+            {/* Slide indicators */}
+            <div
+              className="absolute bottom-3 right-3 z-[4] flex gap-1.5"
+              aria-hidden
+            >
+              {SECTION_TOP_IMAGES.map((_, i) => (
+                <span
+                  key={i}
+                  className={`h-1.5 w-1.5 rounded-full transition-colors duration-500 ${
+                    i === topSlideIndex ? "bg-white" : "bg-white/40"
+                  }`}
+                />
+              ))}
+            </div>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -333,15 +440,40 @@ export function HomeView({
             style={{ y: parallaxY2 }}
             className="absolute bottom-0 right-0 w-[65%] h-[60%] z-20 rounded-2xl overflow-hidden shadow-[-10px_10px_40px_rgba(0,0,0,0.12)] ring-1 ring-black/5"
           >
-            <Image
-              src={sectionVillaBottom}
-              alt="Villa at dusk"
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 65vw, 400px"
-            />
+            <AnimatePresence mode="popLayout">
+              <motion.div
+                key={bottomSlideIndex}
+                initial={{ opacity: 0, scale: 1.05 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1, ease: "easeInOut" }}
+                className="absolute inset-0"
+              >
+                <Image
+                  src={SECTION_BOTTOM_IMAGES[bottomSlideIndex]}
+                  alt={`Villa au crépuscule — ${bottomSlideIndex + 1}`}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 65vw, 400px"
+                />
+              </motion.div>
+            </AnimatePresence>
             <div className="absolute inset-0 bg-gradient-to-bl from-gold/15 via-transparent to-navy/15" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+            {/* Slide indicators */}
+            <div
+              className="absolute bottom-3 right-3 z-[4] flex gap-1.5"
+              aria-hidden
+            >
+              {SECTION_BOTTOM_IMAGES.map((_, i) => (
+                <span
+                  key={i}
+                  className={`h-1.5 w-1.5 rounded-full transition-colors duration-500 ${
+                    i === bottomSlideIndex ? "bg-white" : "bg-white/40"
+                  }`}
+                />
+              ))}
+            </div>
           </motion.div>
 
           <div className="absolute -bottom-4 -right-4 w-32 h-32 border-b-2 border-r-2 border-gold/30 rounded-br-3xl pointer-events-none" />
@@ -419,14 +551,24 @@ export function HomeView({
         </motion.div>
       </section>
 
+      <ContactCaptureModal
+        open={isCaptureOpen}
+        thankYou={captureThankYou}
+        submitting={captureSubmitting}
+        error={captureError}
+        modal={dict.modal}
+        onCloseAction={closeCaptureModal}
+        onSubmitAction={handleCaptureSubmit}
+      />
+
       <EnquireModal
         open={isModalOpen}
         leadThankYou={leadThankYou}
         leadSubmitting={leadSubmitting}
         leadError={leadError}
         modal={dict.modal}
-        onClose={closeEnquireModal}
-        onLeadSubmit={handleLeadSubmit}
+        onCloseAction={closeEnquireModal}
+        onLeadSubmitAction={handleLeadSubmit}
       />
     </main>
   );

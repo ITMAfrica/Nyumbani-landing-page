@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { ChevronRight, X } from "lucide-react";
+import { ChevronRight, X, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import type { Dictionary } from "@/lib/dictionaries";
+import { leadFormSchema, type LeadFormValues } from "@/lib/validations";
 
 import heroPlatinum from "../photos/hero-1.jpg";
 import heroGold from "../photos/hero-2.jpg";
@@ -12,8 +15,11 @@ import heroGold from "../photos/hero-2.jpg";
 const glassField =
   "w-full rounded-xl border border-white/30 bg-white/[0.06] px-4 py-3 text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-sm transition placeholder:text-white/60 focus:border-gold/50 focus:outline-none focus:ring-2 focus:ring-gold/30 font-light text-sm";
 
+const glassFieldError =
+  "w-full rounded-xl border border-red-400/60 bg-white/[0.06] px-4 py-3 text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-sm transition placeholder:text-white/60 focus:border-red-400/70 focus:outline-none focus:ring-2 focus:ring-red-400/30 font-light text-sm";
+
 const glassSelect =
-  "w-full rounded-xl border border-white/30 bg-navy/60 px-4 py-3 text-white/80 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-sm transition focus:border-gold/50 focus:outline-none focus:ring-2 focus:ring-gold/30 font-light text-sm appearance-none cursor-pointer";
+  "w-full rounded-xl border border-white/30 bg-white/[0.06] px-4 py-3 text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] backdrop-blur-sm transition focus:border-gold/50 focus:outline-none focus:ring-2 focus:ring-gold/30 font-light text-sm appearance-none cursor-pointer";
 
 export type EnquireModalProps = {
   open: boolean;
@@ -21,11 +27,8 @@ export type EnquireModalProps = {
   leadSubmitting: boolean;
   leadError: string | null;
   modal: Dictionary["modal"];
-  onClose: () => void;
-  onLeadSubmit: (
-    e: FormEvent<HTMLFormElement>,
-    tier: "gold" | "platinum",
-  ) => void | Promise<void>;
+  onCloseAction: () => void;
+  onLeadSubmitAction: (data: LeadFormValues) => Promise<void>;
 };
 
 export function EnquireModal({
@@ -34,13 +37,30 @@ export function EnquireModal({
   leadSubmitting,
   leadError,
   modal,
-  onClose,
-  onLeadSubmit,
+  onCloseAction,
+  onLeadSubmitAction,
 }: EnquireModalProps) {
   const [selectedTier, setSelectedTier] = useState<"gold" | "platinum" | null>(
     null,
   );
 
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm<LeadFormValues>({
+    resolver: zodResolver(leadFormSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      tier: undefined,
+    },
+  });
+
+  // Lock body scroll when modal is open
   useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
@@ -52,93 +72,119 @@ export function EnquireModal({
     };
   }, [open]);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    if (!selectedTier) return;
-    onLeadSubmit(e, selectedTier);
+  // Reset form when modal opens/closes
+  useEffect(() => {
+    if (!open) {
+      const timer = setTimeout(() => {
+        setSelectedTier(null);
+        reset();
+      }, 300); // wait for exit animation
+      return () => clearTimeout(timer);
+    }
+  }, [open, reset]);
+
+  const handleTierSelect = (tier: "gold" | "platinum") => {
+    setSelectedTier(tier);
+    setValue("tier", tier);
+  };
+
+  const handleBack = () => {
+    setSelectedTier(null);
+    setValue("tier", undefined as unknown as "gold");
+  };
+
+  const onSubmit = async (data: LeadFormValues) => {
+    await onLeadSubmitAction(data);
   };
 
   const cardOverlay = (
     <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/10" />
   );
 
-  const chevronIcon = (
-    <ChevronRight
-      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40 rotate-90"
-      strokeWidth={1.5}
-    />
-  );
+  const labelClass =
+    "text-[10px] font-semibold uppercase tracking-[0.15em] text-white/70 mb-1.5 block";
 
-  const leadFormFields = (
-    <>
-      <input
-        id="lead-name"
-        name="lead-name"
-        type="text"
-        autoComplete="name"
-        required
-        disabled={leadSubmitting}
-        placeholder={modal.fullName}
-        aria-label={modal.fullName}
-        className={glassField}
-      />
-      <input
-        id="lead-email"
-        name="lead-email"
-        type="email"
-        autoComplete="email"
-        required
-        disabled={leadSubmitting}
-        placeholder={modal.email}
-        aria-label={modal.email}
-        className={glassField}
-      />
-      <input
-        id="lead-phone"
-        name="lead-phone"
-        type="tel"
-        autoComplete="tel"
-        disabled={leadSubmitting}
-        placeholder={modal.phone}
-        aria-label={modal.phone}
-        className={glassField}
-      />
-      <div className="relative">
-        <select
-          id="lead-plan"
-          name="lead-plan"
+  const errorClass = "text-[11px] text-red-300 mt-1 font-light";
+
+  const formFields = (
+    <div className="flex flex-col gap-3">
+      {/* Name */}
+      <div>
+        <label htmlFor="lead-name" className={labelClass}>
+          {modal.fullName}
+        </label>
+        <input
+          id="lead-name"
+          type="text"
+          autoComplete="name"
           disabled={leadSubmitting}
-          defaultValue=""
-          className={glassSelect}
-        >
-          <option value="" disabled>
-            {modal.selectInvestmentPlan}
-          </option>
-          <option value="1bed">{modal.plan1bed}</option>
-          <option value="2bed">{modal.plan2bed}</option>
-          <option value="3bed">{modal.plan3bed}</option>
-          <option value="3bedPlus">{modal.plan3bedPlus}</option>
-          <option value="shares">{modal.planShares}</option>
-        </select>
-        {chevronIcon}
+          placeholder={modal.fullName}
+          aria-label={modal.fullName}
+          className={errors.name ? glassFieldError : glassField}
+          {...register("name")}
+        />
+        {errors.name && (
+          <p className={errorClass} role="alert">
+            {errors.name.message}
+          </p>
+        )}
       </div>
-      <div className="relative">
-        <select
-          id="lead-reason"
-          name="lead-reason"
+
+      {/* Email */}
+      <div>
+        <label htmlFor="lead-email" className={labelClass}>
+          {modal.email}
+        </label>
+        <input
+          id="lead-email"
+          type="email"
+          autoComplete="email"
           disabled={leadSubmitting}
-          defaultValue=""
-          className={glassSelect}
-        >
-          <option value="" disabled>
-            {modal.reasonForInvestment}
-          </option>
-          <option value="occupancy">{modal.reasonOccupancy}</option>
-          <option value="shortTerm">{modal.reasonShortTerm}</option>
-          <option value="longTerm">{modal.reasonLongTerm}</option>
-        </select>
-        {chevronIcon}
+          placeholder={modal.email}
+          aria-label={modal.email}
+          className={errors.email ? glassFieldError : glassField}
+          {...register("email")}
+        />
+        {errors.email && (
+          <p className={errorClass} role="alert">
+            {errors.email.message}
+          </p>
+        )}
       </div>
-    </>
+
+      {/* Phone */}
+      <div>
+        <label htmlFor="lead-phone" className={labelClass}>
+          {modal.phone}
+        </label>
+        <input
+          id="lead-phone"
+          type="tel"
+          autoComplete="tel"
+          disabled={leadSubmitting}
+          placeholder={modal.phone}
+          aria-label={modal.phone}
+          className={glassField}
+          {...register("phone")}
+        />
+      </div>
+
+      {/* Submit */}
+      <button
+        type="submit"
+        disabled={leadSubmitting}
+        className="mt-2 inline-flex w-fit items-center gap-2 border border-gold bg-gold/30 px-5 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-white rounded-full transition hover:bg-gold/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/80 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {leadSubmitting ? modal.submitting : modal.submitContact}
+        <ChevronRight className="h-3.5 w-3.5" strokeWidth={2} aria-hidden />
+      </button>
+
+      {leadError && (
+        <p className="text-xs text-red-200" role="alert">
+          {leadError}
+        </p>
+      )}
+    </div>
   );
 
   return (
@@ -158,7 +204,7 @@ export function EnquireModal({
             className="absolute inset-0 bg-black/[0.12] backdrop-blur-[2px]"
             onClick={() => {
               if (leadThankYou) return;
-              onClose();
+              onCloseAction();
             }}
             aria-hidden
           />
@@ -177,7 +223,7 @@ export function EnquireModal({
                 type="button"
                 onClick={() => {
                   if (leadThankYou) return;
-                  onClose();
+                  onCloseAction();
                 }}
                 disabled={leadThankYou}
                 className="absolute right-4 top-4 z-20 rounded-full border border-white/35 bg-white/[0.08] p-2 text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.35)] backdrop-blur-sm transition hover:bg-white/15 disabled:pointer-events-none disabled:opacity-40"
@@ -195,7 +241,11 @@ export function EnquireModal({
                   id="contact-modal-title"
                   className="mt-2 font-serif text-2xl font-normal text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.4)] sm:text-4xl"
                 >
-                  {leadThankYou ? modal.thankYouContact : modal.chooseApproach}
+                  {leadThankYou
+                    ? modal.thankYouContact
+                    : selectedTier
+                      ? modal.requestInfo
+                      : modal.chooseApproach}
                 </h3>
                 {!leadThankYou && (
                   <p className="mt-3 text-sm font-light text-white/90 [text-shadow:0_1px_4px_rgba(0,0,0,0.35)]">
@@ -206,13 +256,32 @@ export function EnquireModal({
                 )}
               </div>
 
-              {/* Cards */}
+              {/* Thank you state */}
+              {leadThankYou && (
+                <div className="flex flex-1 items-center justify-center">
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-center"
+                  >
+                    <p className="font-serif text-2xl text-white sm:text-3xl">
+                      {modal.thankYouContact}
+                    </p>
+                  </motion.div>
+                </div>
+              )}
+
+              {/* Tier selection + Form */}
               {!leadThankYou && (
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
                   {/* ==================== GOLD ==================== */}
                   {selectedTier === "gold" ? (
-                    <div className="relative flex flex-col overflow-hidden rounded-2xl border border-gold/60 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.5)] ring-2 ring-gold/30">
-                      <div className="relative aspect-[16/8] w-full shrink-0 overflow-hidden">
+                    <form
+                      onSubmit={handleSubmit(onSubmit)}
+                      className="relative flex flex-col overflow-hidden rounded-2xl border border-gold/60 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.5)] ring-2 ring-gold/30"
+                      noValidate
+                    >
+                      <div className="relative aspect-[16/6] w-full shrink-0 overflow-hidden">
                         <Image
                           src={heroGold}
                           alt="Nyumbani Gold"
@@ -222,50 +291,35 @@ export function EnquireModal({
                           placeholder="blur"
                         />
                         {cardOverlay}
-                        <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
+                        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
                           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-light">
                             {modal.livingCollection}
                           </p>
-                          <p className="mt-1 font-serif text-2xl text-white sm:text-3xl">
+                          <p className="mt-0.5 font-serif text-xl text-white sm:text-2xl">
                             {modal.gold}
                           </p>
                         </div>
                       </div>
-                      <div className="bg-black/40 backdrop-blur-sm p-6 sm:p-8">
-                        <form
-                          onSubmit={handleSubmit}
-                          className="flex flex-col gap-4"
-                          noValidate
+                      <div className="bg-black/40 backdrop-blur-sm p-4 sm:p-5">
+                        {/* Back button */}
+                        <button
+                          type="button"
+                          onClick={handleBack}
+                          disabled={leadSubmitting}
+                          className="mb-4 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-white/60 transition hover:text-white/90"
                         >
-                          {leadFormFields}
-                          <button
-                            type="submit"
-                            disabled={leadSubmitting}
-                            className="inline-flex w-fit items-center gap-2 border border-gold bg-gold/30 px-5 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-white rounded-full transition hover:bg-gold/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/80"
-                          >
-                            {leadSubmitting
-                              ? modal.submitting
-                              : modal.submitContact}
-                            <ChevronRight
-                              className="h-3.5 w-3.5"
-                              strokeWidth={2}
-                              aria-hidden
-                            />
-                          </button>
-                          {leadError ? (
-                            <p className="text-xs text-red-200" role="alert">
-                              {leadError}
-                            </p>
-                          ) : null}
-                        </form>
+                          <ArrowLeft size={14} strokeWidth={2} />
+                          {modal.backToCollections}
+                        </button>
+                        {formFields}
                       </div>
-                    </div>
+                    </form>
                   ) : (
                     <button
                       type="button"
-                      onClick={() => setSelectedTier("gold")}
-                      disabled={leadSubmitting}
-                      className="group relative flex min-h-[360px] overflow-hidden rounded-2xl border border-white/20 text-left shadow-[0_24px_60px_-20px_rgba(0,0,0,0.5)] transition hover:border-gold/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/80"
+                      onClick={() => handleTierSelect("gold")}
+                      disabled={leadSubmitting || selectedTier !== null}
+                      className="group relative flex min-h-[360px] overflow-hidden rounded-2xl border border-white/20 text-left shadow-[0_24px_60px_-20px_rgba(0,0,0,0.5)] transition hover:border-gold/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/80 disabled:pointer-events-none disabled:opacity-40"
                     >
                       <Image
                         src={heroGold}
@@ -298,8 +352,12 @@ export function EnquireModal({
 
                   {/* ==================== PLATINUM ==================== */}
                   {selectedTier === "platinum" ? (
-                    <div className="relative flex flex-col overflow-hidden rounded-2xl border border-gold/60 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.5)] ring-2 ring-gold/30">
-                      <div className="relative aspect-[16/8] w-full shrink-0 overflow-hidden">
+                    <form
+                      onSubmit={handleSubmit(onSubmit)}
+                      className="relative flex flex-col overflow-hidden rounded-2xl border border-gold/60 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.5)] ring-2 ring-gold/30"
+                      noValidate
+                    >
+                      <div className="relative aspect-[16/6] w-full shrink-0 overflow-hidden">
                         <Image
                           src={heroPlatinum}
                           alt="Nyumbani Platinum"
@@ -309,50 +367,35 @@ export function EnquireModal({
                           placeholder="blur"
                         />
                         {cardOverlay}
-                        <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
+                        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
                           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-light">
                             {modal.investmentCollection}
                           </p>
-                          <p className="mt-1 font-serif text-2xl text-white sm:text-3xl">
+                          <p className="mt-0.5 font-serif text-xl text-white sm:text-2xl">
                             {modal.platinum}
                           </p>
                         </div>
                       </div>
-                      <div className="bg-black/40 backdrop-blur-sm p-6 sm:p-8">
-                        <form
-                          onSubmit={handleSubmit}
-                          className="flex flex-col gap-4"
-                          noValidate
+                      <div className="bg-black/40 backdrop-blur-sm p-4 sm:p-5">
+                        {/* Back button */}
+                        <button
+                          type="button"
+                          onClick={handleBack}
+                          disabled={leadSubmitting}
+                          className="mb-4 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-white/60 transition hover:text-white/90"
                         >
-                          {leadFormFields}
-                          <button
-                            type="submit"
-                            disabled={leadSubmitting}
-                            className="inline-flex w-fit items-center gap-2 border border-gold bg-gold/30 px-5 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-white rounded-full transition hover:bg-gold/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/80"
-                          >
-                            {leadSubmitting
-                              ? modal.submitting
-                              : modal.submitContact}
-                            <ChevronRight
-                              className="h-3.5 w-3.5"
-                              strokeWidth={2}
-                              aria-hidden
-                            />
-                          </button>
-                          {leadError ? (
-                            <p className="text-xs text-red-200" role="alert">
-                              {leadError}
-                            </p>
-                          ) : null}
-                        </form>
+                          <ArrowLeft size={14} strokeWidth={2} />
+                          {modal.backToCollections}
+                        </button>
+                        {formFields}
                       </div>
-                    </div>
+                    </form>
                   ) : (
                     <button
                       type="button"
-                      onClick={() => setSelectedTier("platinum")}
-                      disabled={leadSubmitting}
-                      className="group relative flex min-h-[360px] overflow-hidden rounded-2xl border border-white/20 text-left shadow-[0_24px_60px_-20px_rgba(0,0,0,0.5)] transition hover:border-gold/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/80"
+                      onClick={() => handleTierSelect("platinum")}
+                      disabled={leadSubmitting || selectedTier !== null}
+                      className="group relative flex min-h-[360px] overflow-hidden rounded-2xl border border-white/20 text-left shadow-[0_24px_60px_-20px_rgba(0,0,0,0.5)] transition hover:border-gold/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/80 disabled:pointer-events-none disabled:opacity-40"
                     >
                       <Image
                         src={heroPlatinum}

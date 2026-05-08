@@ -1,20 +1,53 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Nyumbani Landing Page
 
-# Run and deploy your AI Studio app
+> Site vitrine de Nyumbani — la branche exclusive de courtage immobilier et conseil en investissement du groupe ITM, dédiée aux opportunités immobilières les plus prometteuses de Nairobi et d'Afrique.
 
-This contains everything you need to run your app locally.
+## 🏠 À propos
 
-View your app in AI Studio: https://ai.studio/apps/d5d1f322-01d6-4191-b7f0-2b195f8ad241
+**Nyumbani** (qui signifie « maison » en swahili) est un courtier immobilier basé à Nairobi, spécialisé dans l'accompagnement des particuliers, familles, professionnels et investisseurs de la diaspora à travers l'Afrique. Soutenu par **ITM Group** — un conglomérat panafricain présent dans 23 entités en Afrique, en Europe et aux Émirats arabes unis — Nyumbani propose des solutions immobilières transfrontalières de confiance.
 
-## Run Locally
+La marque opère deux gammes distinctes :
 
-**Prerequisites:**  Node.js
+| Gamme | Positionnement | Public cible |
+|---|---|---|
+| **Nyumbani Platinum** | Premium, luxe, investissement | Investisseurs recherchant des biens haut de gamme |
+| **Nyumbani Gold** | Accessible, value-driven | Primo-accédants et investisseurs pragmatiques |
 
+## ✨ Fonctionnalités
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+- **Landing page bilingue** (Anglais / Français) avec changement de langue dynamique
+- **Modal d'enquête interactif** avec sélection de la gamme (Gold ou Platinum) et formulaire de contact
+- **Galerie d'appartements** avec lightbox — 5 appartements/services en vitrine (Garden City, Mi Vida, Marcus Garden, Imagine by Benaa)
+- **Pages de pricing** détaillées pour les gammes Gold et Platinum
+- **Formulaire newsletter** avec endpoint API dédié
+- **Animations fluides** via Motion (ex-Framer Motion)
+- **Design responsive** optimisé jusqu'à 1600px
+- **Optimisation d'images** automatisée (scripts Sharp)
+
+## 🛠️ Stack technique
+
+| Catégorie | Technologie |
+|---|---|
+| Framework | [Next.js 15](https://nextjs.org/) (App Router) |
+| Langage | TypeScript 5.9 |
+| Styling | [Tailwind CSS v4](https://tailwindcss.com/) avec `tw-animate-css` |
+| Animations | [Motion](https://motion.dev/) (ex-Framer Motion) |
+| Formulaires | React Hook Form + resolvers |
+| Icônes | [Lucide React](https://lucide.dev/) |
+| Qualité code | ESLint 9 + config Next |
+| Déploiement | Firebase (firebase-tools) |
+| Traitement images | Sharp |
+
+## 🚀 Démarrer le projet
+
+### Prérequis
+
+- **Node.js** ≥ 20
+- **npm** ≥ 10
+
+### Installation
+
+```bash
+git clone <url-du-repo>
+cd Nyumbani-landing-page
+npm install
