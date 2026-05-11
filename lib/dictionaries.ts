@@ -72,6 +72,7 @@ export type Dictionary = {
     home: string;
     photos: string;
     view: string;
+    viewAll: string;
     expandPhotoAria: string;
     lightboxClose: string;
     lightboxPrev: string;
@@ -172,6 +173,7 @@ const en: Dictionary = {
     home: "Home",
     photos: "photo(s) — click any image for full size",
     view: "View",
+    viewAll: "View all photos",
     expandPhotoAria: "Open full-screen photo",
     lightboxClose: "Close gallery",
     lightboxPrev: "Previous photo",
@@ -275,6 +277,7 @@ const fr: Dictionary = {
     home: "Accueil",
     photos: "photo(s) — cliquez sur une image pour la taille réelle",
     view: "Voir",
+    viewAll: "Voir toutes les photos",
     expandPhotoAria: "Ouvrir la photo en plein écran",
     lightboxClose: "Fermer la galerie",
     lightboxPrev: "Photo précédente",
