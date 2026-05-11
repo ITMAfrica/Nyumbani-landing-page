@@ -21,7 +21,7 @@ export type Dictionary = {
     title: string;
     description: string;
     tiers: string;
-    pills: [string, string, string];
+    pills: [string, string];
     cta: string;
   };
   modal: {
@@ -72,6 +72,7 @@ export type Dictionary = {
     home: string;
     photos: string;
     view: string;
+    viewAll: string;
     expandPhotoAria: string;
     lightboxClose: string;
     lightboxPrev: string;
@@ -117,7 +118,7 @@ const en: Dictionary = {
       "Nyumbani is a Nairobi-headquartered property brokerage and investment advisory firm dedicated to simplifying real estate ownership for individuals, families, professionals, and diaspora investors across Africa. With the backing of ITM Group—a pan-African business powerhouse with footprints across 23 entities in Africa, Europe, and the UAE—Nyumbani is uniquely positioned to offer trusted, cross-border property solutions to both local and international clients.",
     tiers:
       "Nyumbani operates two client tiers: Nyumbani Platinum (premium, luxury-focused) and Nyumbani Gold (accessible, value-driven), ensuring every market segment can access professional property services aligned with international standards.",
-    pills: ["Pan-African Reach", "ITM Group Backed", "23+ Entities"],
+    pills: ["ITM Group Backed", "23+ Entities"],
     cta: "Discover our tiers",
   },
   modal: {
@@ -172,6 +173,7 @@ const en: Dictionary = {
     home: "Home",
     photos: "photo(s) — click any image for full size",
     view: "View",
+    viewAll: "View all photos",
     expandPhotoAria: "Open full-screen photo",
     lightboxClose: "Close gallery",
     lightboxPrev: "Previous photo",
@@ -218,7 +220,7 @@ const fr: Dictionary = {
       "Nyumbani est un courtier immobilier et cabinet de conseil en investissement basé à Nairobi, dédié à simplifier la propriété immobilière pour les individus, familles, professionnels et investisseurs de la diaspora à travers l'Afrique. Soutenu par ITM Group — un puissant groupe d'entreprises panafricain présent dans 23 entités en Afrique, en Europe et aux Émirats arabes unis — Nyumbani est idéalement positionné pour offrir des solutions immobilières transfrontalières fiables aux clients locaux et internationaux.",
     tiers:
       "Nyumbani opère deux niveaux de clientèle : Nyumbani Platinum (premium, axé sur le luxe) et Nyumbani Gold (accessible, axé sur la valeur), garantissant que chaque segment du marché peut accéder à des services immobiliers professionnels conformes aux standards internationaux.",
-    pills: ["Présence panafricaine", "Soutenu par ITM Group", "23+ Entités"],
+    pills: ["Soutenu par ITM Group", "23+ Entités"],
     cta: "Découvrir nos offres",
   },
   modal: {
@@ -275,6 +277,7 @@ const fr: Dictionary = {
     home: "Accueil",
     photos: "photo(s) — cliquez sur une image pour la taille réelle",
     view: "Voir",
+    viewAll: "Voir toutes les photos",
     expandPhotoAria: "Ouvrir la photo en plein écran",
     lightboxClose: "Fermer la galerie",
     lightboxPrev: "Photo précédente",
