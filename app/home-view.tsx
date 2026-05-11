@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { motion, AnimatePresence, useScroll, useTransform } from "motion/react";
 import { useI18n } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/dictionaries";
@@ -82,7 +82,7 @@ export function HomeView({
         ? initialSearch.enquire[0]
         : undefined;
 
-  const { dict } = useI18n();
+  const { dict, lang } = useI18n();
   const HERO_CONTENT = getHeroContent(dict);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [topSlideIndex, setTopSlideIndex] = useState(0);
@@ -151,7 +151,7 @@ export function HomeView({
       fetch("/api/mail/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, lang }),
         keepalive: true,
       }).catch(() => {
         // Silently ignore – the user has already moved on.
@@ -160,7 +160,7 @@ export function HomeView({
       // Redirect immediately to the destination page while the backend updates.
       window.location.href = "/pricing/platinum";
     },
-    [persistIntroDone],
+    [persistIntroDone, lang],
   );
 
   const handleLeadSubmit = useCallback(
@@ -172,7 +172,7 @@ export function HomeView({
         const response = await fetch("/api/mail/lead", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
+          body: JSON.stringify({ ...data, lang }),
         });
 
         if (!response.ok) {
@@ -197,7 +197,7 @@ export function HomeView({
         setLeadSubmitting(false);
       }
     },
-    [persistIntroDone, dict.modal.sendFailed],
+    [persistIntroDone, dict.modal.sendFailed, lang],
   );
 
   useEffect(() => {
@@ -560,10 +560,8 @@ export function HomeView({
                 }}
                 className={`inline-block text-[11px] font-semibold uppercase tracking-[0.15em] px-3.5 py-1.5 rounded-full border ${
                   i === 0
-                    ? "bg-gold/[0.07] border-gold/25 text-gold-dark"
-                    : i === 1
-                      ? "bg-navy/[0.05] border-navy-light/20 text-navy-light"
-                      : "bg-platinum/30 border-platinum-dark/25 text-slate-700"
+                    ? "bg-navy/[0.05] border-navy-light/20 text-navy-light"
+                    : "bg-platinum/30 border-platinum-dark/25 text-slate-700"
                 }`}
               >
                 {pill}
@@ -613,27 +611,7 @@ export function HomeView({
             {dict.howWeWork.tiers}
           </motion.div>
 
-          {/* CTA Link */}
-          <motion.div
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: {
-                opacity: 1,
-                y: 0,
-                transition: { duration: 0.7, ease: "easeOut" },
-              },
-            }}
-          >
-            <Link
-              href="/pricing/platinum"
-              className="group inline-flex items-center gap-2 text-sm font-semibold text-navy hover:text-gold-dark transition-colors duration-300"
-            >
-              <span className="border-b border-navy/20 group-hover:border-gold/40 transition-colors duration-300 pb-0.5">
-                {dict.howWeWork.cta}
-              </span>
-              <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-            </Link>
-          </motion.div>
+
         </motion.div>
       </section>
 

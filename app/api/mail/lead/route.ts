@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
-import { sendMailToItm } from "@/lib/itm-mail";
+import {
+  sendContactToItm,
+  buildLeadContactPayload,
+} from "@/lib/itm-mail";
 
 type LeadBody = {
   name?: string;
   email?: string;
   phone?: string;
   tier?: string;
+  lang?: string;
 };
 
 export async function POST(request: Request) {
@@ -30,14 +34,21 @@ export async function POST(request: Request) {
     );
   }
 
+  const lang = body.lang?.trim() || "fr";
+  const receiverEmail =
+    process.env.MAIL_RECEIVER_EMAIL?.trim() || "client@nyumbani-africa.com";
+
   try {
-    const result = await sendMailToItm({
-      source: "lead",
+    const payload = buildLeadContactPayload({
+      lang,
       name,
       email,
       phone: body.phone?.trim(),
       tier: body.tier,
+      receiverEmail,
     });
+
+    const result = await sendContactToItm(payload);
 
     if (!result.ok) {
       return NextResponse.json(

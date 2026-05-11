@@ -8,7 +8,7 @@ import { useI18n } from "@/lib/i18n";
 import { newsletterSchema, type NewsletterValues } from "@/lib/validations";
 
 export function SiteFooter() {
-  const { dict } = useI18n();
+  const { dict, lang } = useI18n();
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -33,7 +33,7 @@ export function SiteFooter() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, lang }),
       });
       if (!response.ok) {
         throw new Error("newsletter_submit_failed");
