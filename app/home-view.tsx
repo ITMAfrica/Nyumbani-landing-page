@@ -143,24 +143,30 @@ export function HomeView({
       setCaptureSubmitting(true);
       setCaptureError(null);
 
-      // Mark intro as done immediately so the modal never reappears
-      persistIntroDone();
+      try {
+        const response = await fetch("/api/mail/lead", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...data, lang }),
+        });
 
-      // Fire-and-forget: send data to backend without blocking the redirect.
-      // keepalive: true ensures the request completes even after navigation.
-      fetch("/api/mail/lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, lang }),
-        keepalive: true,
-      }).catch(() => {
-        // Silently ignore – the user has already moved on.
-      });
+        if (!response.ok) {
+          throw new Error("lead_submit_failed");
+        }
 
-      // Redirect immediately to the destination page while the backend updates.
-      window.location.href = "/pricing/platinum";
+        persistIntroDone();
+        setCaptureThankYou(true);
+
+        window.setTimeout(() => {
+          window.location.href = "/pricing/platinum";
+        }, 1500);
+      } catch {
+        setCaptureError(dict.modal.sendFailed);
+      } finally {
+        setCaptureSubmitting(false);
+      }
     },
-    [persistIntroDone, lang],
+    [persistIntroDone, dict.modal.sendFailed, lang],
   );
 
   const handleLeadSubmit = useCallback(
