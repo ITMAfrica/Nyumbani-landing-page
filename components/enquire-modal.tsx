@@ -49,6 +49,7 @@ export function EnquireModal({
     handleSubmit,
     setValue,
     reset,
+    resetField,
     formState: { errors },
   } = useForm<LeadFormValues>({
     resolver: zodResolver(leadFormSchema),
@@ -90,7 +91,7 @@ export function EnquireModal({
 
   const handleBack = () => {
     setSelectedTier(null);
-    setValue("tier", undefined as unknown as "gold");
+    resetField("tier");
   };
 
   const onSubmit = async (data: LeadFormValues) => {

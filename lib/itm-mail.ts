@@ -51,7 +51,10 @@ type MailServiceResult = {
 
 // ── Configuration ──
 
-const DEFAULT_TIMEOUT_MS = 10_000;
+const DEFAULT_TIMEOUT_MS = 15_000;
+const MAX_RETRIES = 2;
+const RETRY_DELAY_MS = 2_000;
+const RETRYABLE_STATUSES = new Set([502, 503, 504]);
 
 function getRequiredEnv(name: string): string {
   const value = process.env[name]?.trim();
@@ -82,37 +85,54 @@ async function postToItmApi(
 ): Promise<MailServiceResult> {
   const apiKey = getRequiredEnv("MAIL_SERVICE_API_KEY");
   const endpoint = buildEndpointUrl(endpointPath);
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
 
-  try {
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify(payload),
-      signal: controller.signal,
-      cache: "no-store",
-    });
+  let lastResult: MailServiceResult | null = null;
 
-    let body: unknown = null;
-    const contentType = response.headers.get("content-type") ?? "";
-    if (contentType.includes("application/json")) {
-      body = await response.json().catch(() => null);
-    } else {
-      body = await response.text().catch(() => null);
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+        cache: "no-store",
+      });
+
+      let body: unknown = null;
+      const contentType = response.headers.get("content-type") ?? "";
+      if (contentType.includes("application/json")) {
+        body = await response.json().catch(() => null);
+      } else {
+        body = await response.text().catch(() => null);
+      }
+
+      lastResult = { ok: response.ok, status: response.status, body };
+
+      // Success → return immediately
+      if (response.ok) return lastResult;
+
+      // Non-retryable error → stop retrying
+      if (!RETRYABLE_STATUSES.has(response.status)) break;
+    } catch {
+      // Network / timeout error on this attempt → may retry
+      lastResult = { ok: false, status: 0, body: "Connection error" };
+    } finally {
+      clearTimeout(timeout);
     }
 
-    return {
-      ok: response.ok,
-      status: response.status,
-      body,
-    };
-  } finally {
-    clearTimeout(timeout);
+    // Wait before retrying (except after the last attempt)
+    if (attempt < MAX_RETRIES) {
+      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+    }
   }
+
+  return lastResult ?? { ok: false, status: 0, body: "No response" };
 }
 
 // ── Public API ──
