@@ -19,32 +19,20 @@ import heroGold from "../photos/hero-2.jpg";
 import sectionVillaTop1 from "../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_4968.webp";
 import sectionVillaTop2 from "../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_4974.webp";
 import sectionVillaTop3 from "../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_4985.webp";
-import sectionVillaTop4 from "../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_4995.webp";
-import sectionVillaTop5 from "../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_5001.webp";
-import sectionVillaTop6 from "../photos/105_MARCUS_GARDEN_SERVICED_APARTMENT/IMG_5006.webp";
 import sectionVillaBottom1 from "../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4434.webp";
 import sectionVillaBottom2 from "../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4442.webp";
 import sectionVillaBottom3 from "../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4450.webp";
-import sectionVillaBottom4 from "../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4455.webp";
-import sectionVillaBottom5 from "../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4464.webp";
-import sectionVillaBottom6 from "../photos/IMAGINE_BY_BENAA_SERVICED_APARTMENT/IMG_4469.webp";
 
 const SECTION_TOP_IMAGES = [
   sectionVillaTop1,
   sectionVillaTop2,
   sectionVillaTop3,
-  sectionVillaTop4,
-  sectionVillaTop5,
-  sectionVillaTop6,
 ];
 
 const SECTION_BOTTOM_IMAGES = [
   sectionVillaBottom1,
   sectionVillaBottom2,
   sectionVillaBottom3,
-  sectionVillaBottom4,
-  sectionVillaBottom5,
-  sectionVillaBottom6,
 ];
 
 const HERO_LOGO_URL =
