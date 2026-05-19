@@ -5,12 +5,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { getApartmentBySlug } from '@/lib/apartments';
+import { useI18n } from '@/lib/i18n';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 const LOGO_URL =
   'https://auzyjcdanenhoqyrbjxg.supabase.co/storage/v1/object/public/images/users/7a23a808-8309-4bff-b922-1a9db7482400/e38b6f4a-4227-48e6-8f6d-b3acea7daa8c.png';
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const { dict } = useI18n();
 
   const apartmentMatch = pathname.match(/^\/apartements\/(.+)$/);
   const apt = apartmentMatch ? getApartmentBySlug(apartmentMatch[1]) : null;
@@ -39,15 +42,16 @@ export function SiteHeader() {
             className="inline-flex items-center gap-2 text-sm font-medium tracking-wide text-slate-500 transition hover:text-navy"
           >
             <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-            Home
+            {dict.gallery.home}
           </Link>
           <div className="hidden h-4 w-px bg-slate-200 sm:block" aria-hidden />
-          <div>
+          <div className="flex-1">
             <h1 className="font-serif text-xl font-normal text-slate-900 sm:text-2xl">{apt.title}</h1>
             {apt.subtitle ? (
               <p className="text-[11px] uppercase tracking-[0.15em] text-gold-dark mt-0.5">{apt.subtitle}</p>
             ) : null}
           </div>
+          <LanguageSwitcher variant="dark" />
         </div>
       </header>
     );
@@ -72,13 +76,16 @@ export function SiteHeader() {
           />
         </Link>
       </div>
-      <button
-        type="button"
-        onClick={() => window.dispatchEvent(new Event('nyumbani:open-enquire'))}
-        className="hidden sm:inline-flex items-center gap-2 border border-white/30 bg-white/10 backdrop-blur-sm text-white text-[10px] font-semibold tracking-wider uppercase px-6 py-2.5 rounded-full transition hover:bg-white/20 hover:border-white/50"
-      >
-        Enquire Now
-      </button>
+      <div className="flex items-center gap-3">
+        <LanguageSwitcher variant="light" />
+        <button
+          type="button"
+          onClick={() => window.dispatchEvent(new Event('nyumbani:open-enquire'))}
+          className="inline-flex items-center gap-2 border border-white/30 bg-white/10 backdrop-blur-sm text-white text-[10px] font-semibold tracking-wider uppercase px-6 py-2.5 rounded-full transition hover:bg-white/20 hover:border-white/50"
+        >
+          {dict.hero.enquireNow}
+        </button>
+      </div>
     </header>
   );
 }

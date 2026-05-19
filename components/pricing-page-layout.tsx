@@ -34,7 +34,10 @@ export function PricingPageLayout({
   children,
 }: PricingPageLayoutProps) {
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900 antialiased">
+    <main
+      className="min-h-screen bg-slate-50 text-slate-900 antialiased"
+      suppressHydrationWarning
+    >
       <section className="relative isolate min-h-[min(420px,52vh)] w-full overflow-hidden bg-slate-900">
         <Image
           src={heroImage}
