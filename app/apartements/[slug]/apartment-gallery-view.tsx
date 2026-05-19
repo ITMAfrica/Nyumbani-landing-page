@@ -1,12 +1,13 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import { notFound } from 'next/navigation';
-import { Images } from 'lucide-react';
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { notFound } from "next/navigation";
+import { Images } from "lucide-react";
 
-import { getApartmentBySlug } from '@/lib/apartments';
-import { useI18n } from '@/lib/i18n';
+import { getApartmentBySlug } from "@/lib/apartments";
+import { useI18n } from "@/lib/i18n";
+import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 
 export function ApartmentGalleryView({ slug }: { slug: string }) {
   const { dict } = useI18n();
@@ -17,7 +18,9 @@ export function ApartmentGalleryView({ slug }: { slug: string }) {
     if (!slug || !apt) return;
     let cancelled = false;
     (async () => {
-      const res = await fetch(`/api/apartements/${encodeURIComponent(slug)}/files`);
+      const res = await fetch(
+        `/api/apartements/${encodeURIComponent(slug)}/files`,
+      );
       if (!res.ok) {
         if (!cancelled) notFound();
         return;
@@ -40,7 +43,9 @@ export function ApartmentGalleryView({ slug }: { slug: string }) {
       <main className="flex min-h-screen items-center justify-center bg-slate-50 text-slate-900">
         <div className="flex flex-col items-center gap-3">
           <div className="h-8 w-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-slate-500 font-light">{dict.gallery.loading}</p>
+          <p className="text-sm text-slate-500 font-light">
+            {dict.gallery.loading}
+          </p>
         </div>
       </main>
     );
@@ -64,8 +69,13 @@ export function ApartmentGalleryView({ slug }: { slug: string }) {
                 key={filename}
                 className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-200/80 shadow-sm ring-1 ring-slate-200/60 transition-all duration-300 hover:shadow-xl hover:ring-gold/20"
               >
-                <a href={src} target="_blank" rel="noopener noreferrer" className="block h-full w-full outline-none">
-                  <Image
+                <a
+                  href={src}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block h-full w-full outline-none"
+                >
+                  <ImageWithSkeleton
                     src={src}
                     alt={`${apt.title} — ${filename}`}
                     fill

@@ -7,6 +7,7 @@ import { ArrowLeft, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 import { useI18n } from "@/lib/i18n";
+import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 
 function tierImageUnoptimized(src: StaticImageData | string): boolean {
   return typeof src === "string" && src.startsWith("/api/");
@@ -39,7 +40,7 @@ export function PricingPageLayout({
       suppressHydrationWarning
     >
       <section className="relative isolate min-h-[min(420px,52vh)] w-full overflow-hidden bg-slate-900">
-        <Image
+        <ImageWithSkeleton
           src={heroImage}
           alt={heroAlt}
           fill
@@ -213,7 +214,7 @@ export function PricingTierCard({
                 transition={{ duration: 1.05, ease: [0.4, 0, 0.2, 1] }}
                 className="absolute inset-0 pointer-events-none"
               >
-                <Image
+                <ImageWithSkeleton
                   src={resolved[slide]}
                   alt={`${imageAlt} — ${slide + 1} / ${resolved.length}`}
                   fill
@@ -225,7 +226,7 @@ export function PricingTierCard({
             </AnimatePresence>
           ) : (
             resolved[0] !== undefined && (
-              <Image
+              <ImageWithSkeleton
                 src={resolved[0]}
                 alt={imageAlt}
                 fill

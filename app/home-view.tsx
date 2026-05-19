@@ -14,6 +14,8 @@ import {
   ContactCaptureModal,
   type ContactCaptureValues,
 } from "@/components/contact-capture-modal";
+import { ImageWithSkeleton } from "@/components/image-with-skeleton";
+import { Skeleton } from "@/components/skeleton";
 
 import heroPlatinum from "../photos/hero-1.jpg";
 import heroGold from "../photos/hero-2.jpg";
@@ -84,6 +86,7 @@ export function HomeView({
   const [captureThankYou, setCaptureThankYou] = useState(false);
   const [captureSubmitting, setCaptureSubmitting] = useState(false);
   const [captureError, setCaptureError] = useState<string | null>(null);
+  const [heroImageLoaded, setHeroImageLoaded] = useState(false);
 
   const howWeWorkRef = useRef<HTMLElement>(null);
 
@@ -255,6 +258,9 @@ export function HomeView({
       <section className="relative h-[100dvh] min-h-[650px] sm:min-h-[700px] flex flex-col">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0 bg-slate-900 overflow-hidden">
+          {!heroImageLoaded && (
+            <Skeleton className="absolute inset-0 rounded-none z-[1]" />
+          )}
           <AnimatePresence mode="popLayout">
             <motion.div
               key={currentImageIndex}
@@ -271,6 +277,7 @@ export function HomeView({
                 className="object-cover object-center"
                 priority
                 referrerPolicy="no-referrer"
+                onLoad={() => setHeroImageLoaded(true)}
               />
             </motion.div>
           </AnimatePresence>
@@ -285,7 +292,7 @@ export function HomeView({
             className="inline-flex shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black/20 rounded-sm"
             aria-label="Nyumbani — accueil"
           >
-            <Image
+            <ImageWithSkeleton
               src={HERO_LOGO_URL}
               alt=""
               width={200}
@@ -294,6 +301,7 @@ export function HomeView({
               sizes="(max-width: 640px) 180px, 200px"
               priority
               referrerPolicy="no-referrer"
+              skeletonAspectRatio="200/68"
             />
           </Link>
           <LanguageSwitcher variant="light" />
@@ -409,7 +417,7 @@ export function HomeView({
                 transition={{ duration: 1, ease: "easeInOut" }}
                 className="absolute inset-0"
               >
-                <Image
+                <ImageWithSkeleton
                   src={SECTION_TOP_IMAGES[topSlideIndex]}
                   alt={`Villa moderne — ${topSlideIndex + 1}`}
                   fill
@@ -459,7 +467,7 @@ export function HomeView({
                 transition={{ duration: 1, ease: "easeInOut" }}
                 className="absolute inset-0"
               >
-                <Image
+                <ImageWithSkeleton
                   src={SECTION_BOTTOM_IMAGES[bottomSlideIndex]}
                   alt={`Villa au crépuscule — ${bottomSlideIndex + 1}`}
                   fill

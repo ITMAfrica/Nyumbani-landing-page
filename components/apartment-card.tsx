@@ -6,6 +6,7 @@ import { ChevronRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import type { Apartment } from "@/lib/apartments";
 import type { StaticImageData } from "next/image";
+import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 
 import {
   DoorOpen,
@@ -27,33 +28,33 @@ type ApartmentCardProps = {
 /* ─── Feature icon mapping ─── */
 
 const ICON_MAP: Record<string, string> = {
-  "door": "DoorOpen",
-  "bedroom": "DoorOpen",
-  "chambre": "DoorOpen",
-  "living": "Sofa",
-  "lounge": "Sofa",
-  "salon": "Sofa",
-  "kitchen": "CookingPot",
-  "cuisine": "CookingPot",
-  "bath": "Bath",
-  "security": "ShieldCheck",
-  "secure": "ShieldCheck",
-  "sécurité": "ShieldCheck",
-  "terrace": "TreePine",
-  "balcony": "TreePine",
-  "outdoor": "TreePine",
-  "garden": "TreePine",
-  "jardin": "TreePine",
-  "community": "ShieldCheck",
-  "gated": "ShieldCheck",
-  "entrance": "ShieldCheck",
-  "entrée": "ShieldCheck",
+  door: "DoorOpen",
+  bedroom: "DoorOpen",
+  chambre: "DoorOpen",
+  living: "Sofa",
+  lounge: "Sofa",
+  salon: "Sofa",
+  kitchen: "CookingPot",
+  cuisine: "CookingPot",
+  bath: "Bath",
+  security: "ShieldCheck",
+  secure: "ShieldCheck",
+  sécurité: "ShieldCheck",
+  terrace: "TreePine",
+  balcony: "TreePine",
+  outdoor: "TreePine",
+  garden: "TreePine",
+  jardin: "TreePine",
+  community: "ShieldCheck",
+  gated: "ShieldCheck",
+  entrance: "ShieldCheck",
+  entrée: "ShieldCheck",
   "open plan": "Sparkles",
-  "layout": "Sparkles",
-  "family": "Sparkles",
-  "multi": "Ruler",
-  "level": "Ruler",
-  "amenities": "Building2",
+  layout: "Sparkles",
+  family: "Sparkles",
+  multi: "Ruler",
+  level: "Ruler",
+  amenities: "Building2",
 };
 
 const iconComponents: Record<string, React.ElementType> = {
@@ -96,19 +97,18 @@ function FeatureIcon({ label }: { label: string }) {
 export function ApartmentCard({ apartment, imageSrc }: ApartmentCardProps) {
   const { dict } = useI18n();
   const imgSrc =
-    imageSrc ?? `/api/photo/${apartment.slug}/${encodeURIComponent(apartment.coverFile)}`;
+    imageSrc ??
+    `/api/photo/${apartment.slug}/${encodeURIComponent(apartment.coverFile)}`;
 
   return (
-    <article
-      className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_22px_55px_-28px_rgba(31,45,61,0.2)] ring-1 ring-black/[0.04] transition-[box-shadow,border-color] hover:border-gold/35 hover:shadow-[0_32px_70px_-24px_rgba(31,45,61,0.26)]"
-    >
+    <article className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_22px_55px_-28px_rgba(31,45,61,0.2)] ring-1 ring-black/[0.04] transition-[box-shadow,border-color] hover:border-gold/35 hover:shadow-[0_32px_70px_-24px_rgba(31,45,61,0.26)]">
       {/* Image */}
       <Link
         href={`/apartements/${apartment.slug}`}
         className="relative aspect-[16/10] w-full block overflow-hidden bg-slate-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-0"
         aria-label={`${dict.gallery.view} ${apartment.title}`}
       >
-        <Image
+        <ImageWithSkeleton
           src={imgSrc}
           alt={apartment.title}
           fill
