@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useI18n } from "@/lib/i18n";
 import { newsletterSchema, type NewsletterValues } from "@/lib/validations";
+import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 
 export function SiteFooter() {
   const { dict, lang } = useI18n();
@@ -55,13 +56,14 @@ export function SiteFooter() {
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-10">
           {/* Brand & address */}
           <div className="max-w-sm">
-            <Image
+            <ImageWithSkeleton
               src="https://auzyjcdanenhoqyrbjxg.supabase.co/storage/v1/object/public/images/users/7a23a808-8309-4bff-b922-1a9db7482400/e38b6f4a-4227-48e6-8f6d-b3acea7daa8c.png"
               alt="Nyumbani Logo"
               width={140}
               height={48}
               className="object-contain w-[120px] h-auto mb-6 brightness-0 invert"
               referrerPolicy="no-referrer"
+              skeletonAspectRatio="140/48"
             />
             <address className="not-italic">
               <p className="text-sm font-light leading-relaxed text-white/60">

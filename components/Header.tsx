@@ -1,15 +1,16 @@
-'use client';
+"use client";
 
-import { usePathname } from 'next/navigation';
-import Image from 'next/image';
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
-import { getApartmentBySlug } from '@/lib/apartments';
-import { useI18n } from '@/lib/i18n';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { usePathname } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { getApartmentBySlug } from "@/lib/apartments";
+import { useI18n } from "@/lib/i18n";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 
 const LOGO_URL =
-  'https://auzyjcdanenhoqyrbjxg.supabase.co/storage/v1/object/public/images/users/7a23a808-8309-4bff-b922-1a9db7482400/e38b6f4a-4227-48e6-8f6d-b3acea7daa8c.png';
+  "https://auzyjcdanenhoqyrbjxg.supabase.co/storage/v1/object/public/images/users/7a23a808-8309-4bff-b922-1a9db7482400/e38b6f4a-4227-48e6-8f6d-b3acea7daa8c.png";
 
 export function SiteHeader() {
   const pathname = usePathname();
@@ -27,7 +28,7 @@ export function SiteHeader() {
             className="inline-flex shrink-0 items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 rounded"
             aria-label="Nyumbani — accueil"
           >
-            <Image
+            <ImageWithSkeleton
               src={LOGO_URL}
               alt=""
               width={128}
@@ -35,6 +36,7 @@ export function SiteHeader() {
               className="h-8 w-[104px] object-contain object-left sm:h-9 sm:w-[120px]"
               sizes="(max-width: 640px) 104px, 120px"
               referrerPolicy="no-referrer"
+              skeletonAspectRatio="128/44"
             />
           </Link>
           <Link
@@ -46,9 +48,13 @@ export function SiteHeader() {
           </Link>
           <div className="hidden h-4 w-px bg-slate-200 sm:block" aria-hidden />
           <div className="flex-1">
-            <h1 className="font-serif text-xl font-normal text-slate-900 sm:text-2xl">{apt.title}</h1>
+            <h1 className="font-serif text-xl font-normal text-slate-900 sm:text-2xl">
+              {apt.title}
+            </h1>
             {apt.subtitle ? (
-              <p className="text-[11px] uppercase tracking-[0.15em] text-gold-dark mt-0.5">{apt.subtitle}</p>
+              <p className="text-[11px] uppercase tracking-[0.15em] text-gold-dark mt-0.5">
+                {apt.subtitle}
+              </p>
             ) : null}
           </div>
           <LanguageSwitcher variant="dark" />
@@ -65,7 +71,7 @@ export function SiteHeader() {
           className="inline-flex shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent rounded-sm"
           aria-label="Nyumbani — accueil"
         >
-          <Image
+          <ImageWithSkeleton
             src={LOGO_URL}
             alt=""
             width={160}
@@ -73,6 +79,7 @@ export function SiteHeader() {
             className="object-contain w-[140px] h-auto sm:w-[160px] drop-shadow-lg"
             priority
             referrerPolicy="no-referrer"
+            skeletonAspectRatio="160/54"
           />
         </Link>
       </div>
@@ -80,7 +87,9 @@ export function SiteHeader() {
         <LanguageSwitcher variant="light" />
         <button
           type="button"
-          onClick={() => window.dispatchEvent(new Event('nyumbani:open-enquire'))}
+          onClick={() =>
+            window.dispatchEvent(new Event("nyumbani:open-enquire"))
+          }
           className="inline-flex items-center gap-2 border border-white/30 bg-white/10 backdrop-blur-sm text-white text-[10px] font-semibold tracking-wider uppercase px-6 py-2.5 rounded-full transition hover:bg-white/20 hover:border-white/50"
         >
           {dict.hero.enquireNow}
