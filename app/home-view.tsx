@@ -8,6 +8,7 @@ import { motion, AnimatePresence, useScroll, useTransform } from "motion/react";
 import { useI18n } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/dictionaries";
 import type { LeadFormValues } from "@/lib/validations";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { EnquireModal } from "@/components/enquire-modal";
 import {
   ContactCaptureModal,
@@ -277,25 +278,30 @@ export function HomeView({
           <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent z-10" />
         </div>
 
+        {/* Top Bar: Logo + Language Switcher */}
+        <div className="relative z-20 flex items-center justify-between px-8 pt-16 pb-4 sm:px-16 lg:px-32 w-full max-w-[1600px] mx-auto shrink-0">
+          <Link
+            href="/"
+            className="inline-flex shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black/20 rounded-sm"
+            aria-label="Nyumbani — accueil"
+          >
+            <Image
+              src={HERO_LOGO_URL}
+              alt=""
+              width={200}
+              height={68}
+              className="h-11 w-auto sm:h-14 object-contain object-left drop-shadow-[0_2px_16px_rgba(0,0,0,0.45)]"
+              sizes="(max-width: 640px) 180px, 200px"
+              priority
+              referrerPolicy="no-referrer"
+            />
+          </Link>
+          <LanguageSwitcher variant="light" />
+        </div>
+
         {/* Hero Content */}
         <div className="relative z-10 flex-1 flex flex-col justify-center px-8 sm:px-16 lg:px-32 max-w-[1600px] mx-auto w-full">
-          <div className="max-w-xl w-full flex flex-col gap-20 sm:gap-28">
-            <Link
-              href="/"
-              className="inline-flex shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black/20 rounded-sm"
-              aria-label="Nyumbani — accueil"
-            >
-              <Image
-                src={HERO_LOGO_URL}
-                alt=""
-                width={200}
-                height={68}
-                className="h-11 w-auto sm:h-14 object-contain object-left drop-shadow-[0_2px_16px_rgba(0,0,0,0.45)]"
-                sizes="(max-width: 640px) 180px, 200px"
-                priority
-                referrerPolicy="no-referrer"
-              />
-            </Link>
+          <div className="max-w-xl w-full">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentImageIndex}
@@ -321,7 +327,7 @@ export function HomeView({
                   <button
                     type="button"
                     onClick={openModal}
-                    className="hidden sm:inline-flex items-center gap-2 border border-white/30 bg-white/10 backdrop-blur-sm text-white text-[10px] font-semibold tracking-wider uppercase px-6 py-2.5 rounded-full transition hover:bg-white/20 hover:border-white/50"
+                    className="inline-flex items-center gap-2 border border-white/30 bg-white/10 backdrop-blur-sm text-white text-[10px] font-semibold tracking-wider uppercase px-6 py-2.5 rounded-full transition hover:bg-white/20 hover:border-white/50"
                   >
                     {dict.hero.enquireNow}
                   </button>
@@ -332,7 +338,7 @@ export function HomeView({
         </div>
 
         {/* Carousel Indicators — bottom row on small screens avoids overlap with hero copy; sidebar from md */}
-        <div className="pointer-events-auto absolute z-20 flex gap-8 text-white font-serif text-xl sm:text-2xl max-md:bottom-[7.25rem] max-md:left-1/2 max-md:right-auto max-md:-translate-x-1/2 max-md:flex-row max-md:flex-nowrap max-md:items-center max-md:justify-center max-md:px-4 md:inset-x-auto md:bottom-auto md:left-auto md:translate-x-0 md:right-8 md:top-1/2 md:-translate-y-1/2 md:flex-col md:items-end md:gap-6 lg:right-16">
+        <div className="pointer-events-auto absolute z-20 flex gap-8 text-white font-serif text-xl sm:text-2xl max-md:hidden md:inset-x-auto md:bottom-auto md:left-auto md:translate-x-0 md:right-8 md:top-1/2 md:-translate-y-1/2 md:flex-col md:items-end md:gap-6 lg:right-16">
           {HERO_CONTENT.map((_, index) => {
             const isActive = index === currentImageIndex;
             return (
@@ -579,17 +585,6 @@ export function HomeView({
           </motion.div>
 
           {/* Divider */}
-          <motion.div
-            variants={{
-              hidden: { scaleX: 0 },
-              visible: {
-                scaleX: 1,
-                transition: { duration: 0.8, ease: "easeOut" },
-              },
-            }}
-            className="w-16 h-[1px] bg-gold/30 mb-6 origin-left"
-          />
-
           {/* Tiers info */}
           <motion.div
             variants={{
@@ -604,8 +599,6 @@ export function HomeView({
           >
             {dict.howWeWork.tiers}
           </motion.div>
-
-
         </motion.div>
       </section>
 
